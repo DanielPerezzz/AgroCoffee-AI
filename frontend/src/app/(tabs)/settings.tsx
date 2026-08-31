@@ -237,7 +237,7 @@ export default function SettingsScreen() {
             iconBackground="#EAF4FF"
             title="Vincular dispositivo"
             description="Registrar otro ESP32 mediante su clave"
-            onPress={() => showPendingFeature("Vincular dispositivo")}
+            onPress={() => router.push("/devices/link")}
           />
         </View>
 
