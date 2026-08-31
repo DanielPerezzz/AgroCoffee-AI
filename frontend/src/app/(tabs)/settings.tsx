@@ -270,6 +270,22 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <Pressable
+          className="mt-3 flex-row items-center justify-center rounded-button border border-agro-green bg-white px-5 py-4 active:opacity-60"
+          onPress={() => router.push("/batches/create")}
+          accessibilityRole="button"
+        >
+          <Ionicons
+            name="add-circle-outline"
+            size={23}
+            color="#2F7D32"
+          />
+
+          <Text className="ml-2 font-inter-semibold text-sm text-agro-green-dark">
+            Crear nuevo lote
+          </Text>
+        </Pressable>
+
         {/* Preferencias */}
         <Text className="mb-2 mt-7 font-poppins-semibold text-base text-agro-text">
           Preferencias
