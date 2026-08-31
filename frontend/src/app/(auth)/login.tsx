@@ -1,5 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
@@ -15,12 +16,16 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
-    if (!email.trim() || !password.trim()) {
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail || !password.trim()) {
       Alert.alert(
         "Campos incompletos",
         "Ingresa tu correo electrónico y contraseña."
@@ -28,49 +33,57 @@ export default function LoginScreen() {
       return;
     }
 
-    Alert.alert(
-      "Interfaz preparada",
-      "La autenticación se conectará posteriormente con FastAPI."
-    );
+    /*
+     * Navegación provisional.
+     * Posteriormente se enviarán las credenciales a FastAPI
+     * y solamente se navegará si la autenticación es correcta.
+     */
+    router.replace("/(tabs)");
   };
 
   return (
     <LinearGradient
-  colors={["#EAF4E7", "#F7F5ED", "#FFFFFF"]}
-  style={{ flex: 1 }}
->
+      colors={["#EAF4E7", "#F7F5ED", "#FFFFFF"]}
+      style={{ flex: 1 }}
+    >
       <StatusBar style="dark" />
 
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
-          className="flex-1"
+          style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <ScrollView
-            className="flex-1"
+            style={{ flex: 1 }}
             contentContainerStyle={{
-  flexGrow: 1,
-  justifyContent: "center",
-  paddingHorizontal: 24,
-  paddingVertical: 40,
-}}
+              flexGrow: 1,
+              justifyContent: "center",
+              paddingHorizontal: 24,
+              paddingVertical: 40,
+            }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
+            {/* Encabezado */}
             <View className="mb-8 items-center">
               <View className="h-20 w-20 items-center justify-center rounded-full bg-agro-green">
-                <Ionicons name="leaf-outline" size={44} color="#FFFFFF" />
+                <Ionicons
+                  name="leaf-outline"
+                  size={44}
+                  color="#FFFFFF"
+                />
               </View>
 
-              <Text className="mt-5 font-poppins-bold text-3xl text-agro-green-dark">
+              <Text className="mt-5 text-center font-poppins-bold text-3xl text-agro-green-dark">
                 Bienvenido
               </Text>
 
-              <Text className="mt-2 text-center font-inter text-base text-agro-muted">
+              <Text className="mt-2 px-4 text-center font-inter text-base leading-6 text-agro-muted">
                 Ingresa para supervisar tus procesos de secado
               </Text>
             </View>
 
+            {/* Formulario */}
             <View className="rounded-card bg-white p-6 shadow-lg">
               <Text className="font-poppins-semibold text-sm text-agro-text">
                 Correo electrónico
@@ -92,6 +105,8 @@ export default function LoginScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoComplete="email"
+                  returnKeyType="next"
                 />
               </View>
 
@@ -114,21 +129,44 @@ export default function LoginScreen() {
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="password"
+                  returnKeyType="done"
+                  onSubmitEditing={handleLogin}
                 />
 
                 <Pressable
                   onPress={() => setShowPassword((current) => !current)}
                   hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    showPassword
+                      ? "Ocultar contraseña"
+                      : "Mostrar contraseña"
+                  }
                 >
                   <Ionicons
-                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    name={
+                      showPassword
+                        ? "eye-off-outline"
+                        : "eye-outline"
+                    }
                     size={23}
                     color="#68736B"
                   />
                 </Pressable>
               </View>
 
-              <Pressable className="mt-4 self-end">
+              <Pressable
+                className="mt-4 self-end"
+                accessibilityRole="button"
+                onPress={() => {
+                  Alert.alert(
+                    "Próximamente",
+                    "La recuperación de contraseña se implementará con el backend."
+                  );
+                }}
+              >
                 <Text className="font-inter-medium text-sm text-agro-green">
                   ¿Olvidaste tu contraseña?
                 </Text>
@@ -137,6 +175,7 @@ export default function LoginScreen() {
               <Pressable
                 className="mt-7 flex-row items-center justify-center rounded-button bg-agro-green px-6 py-4 active:bg-agro-green-dark"
                 onPress={handleLogin}
+                accessibilityRole="button"
               >
                 <Text className="font-inter-semibold text-base text-white">
                   Iniciar sesión
@@ -151,6 +190,7 @@ export default function LoginScreen() {
               </Pressable>
             </View>
 
+            {/* Pie */}
             <Text className="mt-8 text-center font-inter text-xs leading-5 text-agro-muted">
               AgroCoffee AI · Monitoreo inteligente del secado
             </Text>
