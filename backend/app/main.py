@@ -1,14 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.core.config import settings
+from app.db.database import engine
+
 
 app = FastAPI(
-    title="AgroCoffee AI API",
+    title=settings.app_name,
     description="API para el monitoreo inteligente del secado de café",
-    version="0.1.0",
+    version=settings.app_version,
 )
 
 # Configuración provisional para desarrollo.
-# Se restringirá antes de una implementación de producción.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,8 +32,19 @@ def read_root():
 
 @app.get("/api/v1/health")
 def health_check():
-    return {
-        "status": "ok",
-        "service": "agrocoffee-api",
-        "version": "0.1.0",
-    }
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return {
+            "status": "ok",
+            "service": "agrocoffee-api",
+            "version": settings.app_version,
+            "database": "connected",
+        }
+
+    except SQLAlchemyError as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No fue posible conectar con la base de datos",
+        ) from error
