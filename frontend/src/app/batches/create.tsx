@@ -135,7 +135,7 @@ export default function CreateBatchScreen() {
         [
           {
             text: "Continuar",
-            onPress: () => router.back(),
+            onPress: () => router.replace("/processes/start"),
           },
         ]
       );

@@ -270,6 +270,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Crear lote */}
         <Pressable
           className="mt-3 flex-row items-center justify-center rounded-button border border-agro-green bg-white px-5 py-4 active:opacity-60"
           onPress={() => router.push("/batches/create")}
@@ -283,6 +284,19 @@ export default function SettingsScreen() {
 
           <Text className="ml-2 font-inter-semibold text-sm text-agro-green-dark">
             Crear nuevo lote
+          </Text>
+        </Pressable>
+
+        {/* Iniciar proceso */}
+        <Pressable
+          className="mt-3 flex-row items-center justify-center rounded-button bg-agro-green px-5 py-4 active:bg-agro-green-dark"
+          onPress={() => router.push("/processes/start")}
+          accessibilityRole="button"
+        >
+          <Ionicons name="play-outline" size={23} color="#FFFFFF" />
+
+          <Text className="ml-2 font-inter-semibold text-sm text-white">
+            Iniciar proceso de secado
           </Text>
         </Pressable>
 
