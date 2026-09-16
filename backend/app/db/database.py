@@ -1,17 +1,34 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
 
-engine = create_engine(
-    settings.database_url,
+def build_async_database_url():
+    database_url = make_url(settings.database_url)
+
+    if database_url.drivername in {"postgres", "postgresql"}:
+        database_url = database_url.set(
+            drivername="postgresql+psycopg"
+        )
+
+    return database_url
+
+
+engine = create_async_engine(
+    build_async_database_url(),
     pool_pre_ping=True,
+    echo=settings.sql_echo,
 )
 
-SessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     autoflush=False,
     expire_on_commit=False,
@@ -22,10 +39,6 @@ class Base(DeclarativeBase):
     pass
 
 
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        yield session

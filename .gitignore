@@ -1,1 +1,22 @@
+# Variables y secretos
 .env
+.env.*
+!.env.example
+**/.env
+
+# Entornos virtuales de Python
+.venv/
+**/.venv/
+venv/
+**/venv/
+
+# Archivos temporales de Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

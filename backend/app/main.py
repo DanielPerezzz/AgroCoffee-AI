@@ -9,11 +9,13 @@ from app.db.database import engine
 
 app = FastAPI(
     title=settings.app_name,
-    description="API para el monitoreo inteligente del secado de café",
+    description=(
+        "API para el monitoreo inteligente del proceso "
+        "de secado de café"
+    ),
     version=settings.app_version,
 )
 
-# Configuración provisional para desarrollo.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,18 +25,23 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def read_root():
+@app.get("/", tags=["General"])
+async def read_root():
     return {
         "message": "Bienvenido a la API de AgroCoffee AI",
+        "version": settings.app_version,
+        "environment": settings.environment,
     }
 
 
-@app.get("/api/v1/health")
-def health_check():
+@app.get(
+    f"{settings.api_v1_prefix}/health",
+    tags=["Health"],
+)
+async def health_check():
     try:
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
 
         return {
             "status": "ok",
