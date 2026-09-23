@@ -4,7 +4,9 @@ from app.core.config import settings
 from app.routes import (
     auth,
     dispositivos,
+    iot,
     lotes,
+    mediciones,
     procesos,
     sensores,
     usuarios,
@@ -18,3 +20,5 @@ api_router.include_router(dispositivos.router)
 api_router.include_router(sensores.router)
 api_router.include_router(lotes.router)
 api_router.include_router(procesos.router)
+api_router.include_router(iot.router)
+api_router.include_router(mediciones.router)
