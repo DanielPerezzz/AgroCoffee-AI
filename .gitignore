@@ -21,6 +21,9 @@ __pycache__/
 backend/app/ml/artifacts/*.joblib
 backend/app/ml/artifacts/metrics.json
 
+# Configuración local del ESP32 (contiene URL y API key)
+iot/wokwi/config.h
+
 # Archivos del sistema
 .DS_Store
 Thumbs.db
