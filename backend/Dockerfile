@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY app ./app
 
+# Entrena modelos reproducibles durante la construcción de la imagen.
+RUN python -m app.ml.train --output-dir /app/app/ml/artifacts
+
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

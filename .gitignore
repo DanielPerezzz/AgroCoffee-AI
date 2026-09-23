@@ -17,6 +17,10 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
+# Modelos de IA generados localmente (se reconstruyen desde el código)
+backend/app/ml/artifacts/*.joblib
+backend/app/ml/artifacts/metrics.json
+
 # Archivos del sistema
 .DS_Store
 Thumbs.db
