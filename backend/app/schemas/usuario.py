@@ -6,6 +6,25 @@ from app.schemas.common import AgroCoffeeSchema
 from app.schemas.enums import EstadoGeneral, RolUsuario
 
 
+def validar_password_seguro(password: str) -> str:
+    if not any(caracter.isupper() for caracter in password):
+        raise ValueError(
+            "La contraseña debe incluir una letra mayúscula"
+        )
+
+    if not any(caracter.islower() for caracter in password):
+        raise ValueError(
+            "La contraseña debe incluir una letra minúscula"
+        )
+
+    if not any(caracter.isdigit() for caracter in password):
+        raise ValueError(
+            "La contraseña debe incluir un número"
+        )
+
+    return password
+
+
 class UsuarioBase(AgroCoffeeSchema):
     nombre: str = Field(
         min_length=2,
@@ -24,22 +43,24 @@ class UsuarioCreate(UsuarioBase):
     @field_validator("password")
     @classmethod
     def validar_password(cls, password: str) -> str:
-        if not any(caracter.isupper() for caracter in password):
-            raise ValueError(
-                "La contraseña debe incluir una letra mayúscula"
-            )
+        return validar_password_seguro(password)
 
-        if not any(caracter.islower() for caracter in password):
-            raise ValueError(
-                "La contraseña debe incluir una letra minúscula"
-            )
 
-        if not any(caracter.isdigit() for caracter in password):
-            raise ValueError(
-                "La contraseña debe incluir un número"
-            )
+class UsuarioRegister(AgroCoffeeSchema):
+    nombre: str = Field(
+        min_length=2,
+        max_length=150,
+    )
+    correo: EmailStr
+    password: str = Field(
+        min_length=8,
+        max_length=128,
+    )
 
-        return password
+    @field_validator("password")
+    @classmethod
+    def validar_password(cls, password: str) -> str:
+        return validar_password_seguro(password)
 
 
 class UsuarioUpdate(AgroCoffeeSchema):

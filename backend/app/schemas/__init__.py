@@ -3,6 +3,13 @@ from app.schemas.alerta import (
     AlertaResponse,
     AlertaUpdate,
 )
+from app.schemas.auth import (
+    ChangePasswordRequest,
+    LogoutRequest,
+    MessageResponse,
+    RefreshTokenRequest,
+    TokenResponse,
+)
 from app.schemas.dispositivo import (
     DispositivoCreate,
     DispositivoRegistroResponse,
@@ -34,6 +41,7 @@ from app.schemas.sensor import (
 )
 from app.schemas.usuario import (
     UsuarioCreate,
+    UsuarioRegister,
     UsuarioResponse,
     UsuarioUpdate,
 )
@@ -42,6 +50,11 @@ __all__ = [
     "AlertaCreate",
     "AlertaResponse",
     "AlertaUpdate",
+    "ChangePasswordRequest",
+    "LogoutRequest",
+    "MessageResponse",
+    "RefreshTokenRequest",
+    "TokenResponse",
     "DispositivoCreate",
     "DispositivoRegistroResponse",
     "DispositivoResponse",
@@ -60,6 +73,7 @@ __all__ = [
     "SensorResponse",
     "SensorUpdate",
     "UsuarioCreate",
+    "UsuarioRegister",
     "UsuarioResponse",
     "UsuarioUpdate",
 ]

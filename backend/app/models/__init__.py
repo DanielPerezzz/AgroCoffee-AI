@@ -4,6 +4,7 @@ from app.models.lote_cafe import LoteCafe
 from app.models.medicion import Medicion
 from app.models.prediccion import Prediccion
 from app.models.proceso_secado import ProcesoSecado
+from app.models.refresh_token import RefreshToken
 from app.models.sensor import Sensor
 from app.models.usuario import Usuario
 
@@ -14,6 +15,7 @@ __all__ = [
     "Medicion",
     "Prediccion",
     "ProcesoSecado",
+    "RefreshToken",
     "Sensor",
     "Usuario",
 ]

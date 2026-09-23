@@ -11,6 +11,7 @@ from app.db.database import Base
 if TYPE_CHECKING:
     from app.models.dispositivo import Dispositivo
     from app.models.lote_cafe import LoteCafe
+    from app.models.refresh_token import RefreshToken
 
 
 class Usuario(Base):
@@ -62,5 +63,12 @@ class Usuario(Base):
     )
     dispositivos: Mapped[list[Dispositivo]] = relationship(
         back_populates="usuario",
+        lazy="selectin",
+    )
+
+    refresh_tokens: Mapped[list[RefreshToken]] = relationship(
+        back_populates="usuario",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
         lazy="selectin",
     )
