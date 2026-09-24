@@ -16,7 +16,36 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
+import { AuthProvider, useAuth } from "@/context/auth-context";
+import { ProcessDataProvider } from "@/context/process-data-context";
+
 SplashScreen.preventAutoHideAsync();
+
+function RootNavigator() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+
+        <Stack.Protected guard={!isAuthenticated}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+
+        <Stack.Protected guard={isAuthenticated}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="batches/create" />
+          <Stack.Screen name="processes/start" />
+          <Stack.Screen name="devices/link" />
+          <Stack.Screen name="explore" />
+        </Stack.Protected>
+      </Stack>
+
+      <StatusBar style="dark" />
+    </>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -39,9 +68,10 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <Stack screenOptions={{ headerShown: false }} />
-      <StatusBar style="dark" />
-    </>
+    <AuthProvider>
+      <ProcessDataProvider>
+        <RootNavigator />
+      </ProcessDataProvider>
+    </AuthProvider>
   );
 }

@@ -15,14 +15,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useAuth } from "@/context/auth-context";
+
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const normalizedEmail = email.trim();
 
     if (!normalizedEmail || !password.trim()) {
@@ -33,12 +37,21 @@ export default function LoginScreen() {
       return;
     }
 
-    /*
-     * Navegación provisional.
-     * Posteriormente se enviarán las credenciales a FastAPI
-     * y solamente se navegará si la autenticación es correcta.
-     */
-    router.replace("/(tabs)");
+    setIsSubmitting(true);
+
+    try {
+      await login(normalizedEmail, password);
+      router.replace("/(tabs)");
+    } catch (error) {
+      Alert.alert(
+        "No fue posible iniciar sesión",
+        error instanceof Error
+          ? error.message
+          : "Verifica tus credenciales y la conexión con el backend."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -132,7 +145,7 @@ export default function LoginScreen() {
                   autoCorrect={false}
                   autoComplete="password"
                   returnKeyType="done"
-                  onSubmitEditing={handleLogin}
+                  onSubmitEditing={() => void handleLogin()}
                 />
 
                 <Pressable
@@ -174,11 +187,12 @@ export default function LoginScreen() {
 
               <Pressable
                 className="mt-7 flex-row items-center justify-center rounded-button bg-agro-green px-6 py-4 active:bg-agro-green-dark"
-                onPress={handleLogin}
+                onPress={() => void handleLogin()}
+                disabled={isSubmitting}
                 accessibilityRole="button"
               >
                 <Text className="font-inter-semibold text-base text-white">
-                  Iniciar sesión
+                  {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
                 </Text>
 
                 <Ionicons
@@ -187,6 +201,18 @@ export default function LoginScreen() {
                   color="#FFFFFF"
                   style={{ marginLeft: 10 }}
                 />
+              </Pressable>
+
+              <Pressable
+                className="mt-5 items-center"
+                onPress={() => router.push("/(auth)/register")}
+                disabled={isSubmitting}
+                accessibilityRole="button"
+              >
+                <Text className="font-inter-medium text-sm text-agro-muted">
+                  ¿No tienes cuenta?{" "}
+                  <Text className="text-agro-green">Regístrate</Text>
+                </Text>
               </Pressable>
             </View>
 

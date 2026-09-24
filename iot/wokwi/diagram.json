@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "author": "AgroCoffee AI",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp32",
+      "top": 10,
+      "left": -10,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht22",
+      "top": -150,
+      "left": 210,
+      "attrs": { "temperature": "29", "humidity": "65" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "coffeeHumidity",
+      "top": -35,
+      "left": 245,
+      "attrs": { "value": "230" }
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "lightSensor",
+      "top": 85,
+      "left": 245,
+      "attrs": { "lux": "720" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "greenLed",
+      "top": -165,
+      "left": -175,
+      "attrs": { "color": "green", "label": "Favorable" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "yellowLed",
+      "top": -80,
+      "left": -175,
+      "attrs": { "color": "yellow", "label": "Secado lento" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "redLed",
+      "top": 5,
+      "left": -175,
+      "attrs": { "color": "red", "label": "Desfavorable" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "greenResistor",
+      "top": -125,
+      "left": -115,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "yellowResistor",
+      "top": -40,
+      "left": -115,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "redResistor",
+      "top": 45,
+      "left": -115,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 155,
+      "left": -165,
+      "attrs": { "volume": "0.15" }
+    }
+  ],
+  "connections": [
+    [ "esp32:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp32:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "dht22:VCC", "esp32:3V3", "red", [ "v0" ] ],
+    [ "dht22:GND", "esp32:GND.1", "black", [ "v0" ] ],
+    [ "dht22:SDA", "esp32:D15", "green", [ "v0" ] ],
+
+    [ "coffeeHumidity:VCC", "esp32:3V3", "red", [ "v0" ] ],
+    [ "coffeeHumidity:GND", "esp32:GND.1", "black", [ "v0" ] ],
+    [ "coffeeHumidity:SIG", "esp32:D34", "purple", [ "v0" ] ],
+
+    [ "lightSensor:VCC", "esp32:3V3", "red", [ "v0" ] ],
+    [ "lightSensor:GND", "esp32:GND.1", "black", [ "v0" ] ],
+    [ "lightSensor:AO", "esp32:D35", "orange", [ "v0" ] ],
+
+    [ "esp32:D25", "greenResistor:1", "green", [ "h-20" ] ],
+    [ "greenResistor:2", "greenLed:A", "green", [ "v0" ] ],
+    [ "greenLed:C", "esp32:GND.2", "black", [ "v0" ] ],
+
+    [ "esp32:D26", "yellowResistor:1", "yellow", [ "h-20" ] ],
+    [ "yellowResistor:2", "yellowLed:A", "yellow", [ "v0" ] ],
+    [ "yellowLed:C", "esp32:GND.2", "black", [ "v0" ] ],
+
+    [ "esp32:D27", "redResistor:1", "red", [ "h-20" ] ],
+    [ "redResistor:2", "redLed:A", "red", [ "v0" ] ],
+    [ "redLed:C", "esp32:GND.2", "black", [ "v0" ] ],
+
+    [ "buzzer:2", "esp32:D14", "blue", [ "h0" ] ],
+    [ "buzzer:1", "esp32:GND.2", "black", [ "h0" ] ]
+  ],
+  "dependencies": {},
+  "serialMonitor": {
+  "display": "always",
+  "collapse": false,
+  "convertEol": false,
+  "newline": "lf"
+}
+}
