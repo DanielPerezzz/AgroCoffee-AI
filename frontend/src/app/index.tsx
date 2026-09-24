@@ -5,16 +5,23 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 
+import { useAuth } from "@/context/auth-context";
+
 export default function SplashScreen() {
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
+    if (isLoading) {
+      return undefined;
+    }
+
     const timer = setTimeout(() => {
-      router.replace("/(auth)/login");
+      router.replace(isAuthenticated ? "/(tabs)" : "/(auth)/login");
     }, 1800);
 
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [isAuthenticated, isLoading, router]);
 
   return (
     <LinearGradient

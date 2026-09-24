@@ -9,42 +9,45 @@ import Svg, {
   Text as SvgText,
 } from "react-native-svg";
 
-const points = [
-  { x: 44, y: 27 },
-  { x: 78, y: 39 },
-  { x: 112, y: 54 },
-  { x: 146, y: 70 },
-  { x: 180, y: 88 },
-  { x: 214, y: 98 },
-  { x: 248, y: 104 },
-  { x: 282, y: 108 },
-  { x: 316, y: 113 },
-];
+type HumidityChartProps = {
+  values: number[];
+  labels: string[];
+  currentValue: string;
+};
 
-const linePath = points
-  .map((point, index) => {
-    return `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`;
-  })
-  .join(" ");
+const LEFT = 44;
+const RIGHT = 316;
+const TOP = 26;
+const BOTTOM = 138;
 
-const areaPath = `${linePath} L 316 140 L 44 140 Z`;
+export function HumidityChart({
+  values,
+  labels,
+  currentValue,
+}: HumidityChartProps) {
+  const data = values.length > 0 ? values : [0];
+  const minimum = Math.max(0, Math.floor(Math.min(...data) - 2));
+  const maximum = Math.max(minimum + 5, Math.ceil(Math.max(...data) + 2));
+  const range = maximum - minimum;
 
-const horizontalLines = [
-  { y: 26, value: "25" },
-  { y: 54, value: "22" },
-  { y: 82, value: "19" },
-  { y: 110, value: "16" },
-  { y: 138, value: "13" },
-];
+  const points = data.map((value, index) => ({
+    x:
+      data.length === 1
+        ? LEFT
+        : LEFT + (index * (RIGHT - LEFT)) / (data.length - 1),
+    y: TOP + ((maximum - value) / range) * (BOTTOM - TOP),
+  }));
 
-const timeLabels = [
-  { x: 44, value: "0h" },
-  { x: 134, value: "24h" },
-  { x: 226, value: "48h" },
-  { x: 316, value: "72h" },
-];
+  const linePath = points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+  const lastPoint = points[points.length - 1];
+  const areaPath = `${linePath} L ${lastPoint?.x ?? RIGHT} ${BOTTOM} L ${LEFT} ${BOTTOM} Z`;
+  const gridValues = Array.from(
+    { length: 5 },
+    (_, index) => maximum - (index * range) / 4
+  );
 
-export function HumidityChart() {
   return (
     <View className="rounded-card border border-black/5 bg-white p-5 shadow-sm">
       <View className="mb-2 flex-row items-start justify-between">
@@ -52,7 +55,6 @@ export function HumidityChart() {
           <Text className="font-poppins-semibold text-base text-agro-text">
             Evolución de humedad
           </Text>
-
           <Text className="mt-1 font-inter text-xs text-agro-muted">
             Humedad estimada del café
           </Text>
@@ -60,7 +62,7 @@ export function HumidityChart() {
 
         <View className="rounded-full bg-agro-green-light px-3 py-1.5">
           <Text className="font-inter-semibold text-sm text-agro-green-dark">
-            19 %
+            {currentValue}
           </Text>
         </View>
       </View>
@@ -73,35 +75,40 @@ export function HumidityChart() {
           </LinearGradient>
         </Defs>
 
-        {horizontalLines.map((line) => (
-          <Line
-            key={line.value}
-            x1="44"
-            y1={line.y}
-            x2="316"
-            y2={line.y}
-            stroke="#DFE5DF"
-            strokeWidth="1"
-            strokeDasharray="4 4"
-          />
-        ))}
+        {gridValues.map((value, index) => {
+          const y = TOP + (index * (BOTTOM - TOP)) / 4;
+          return (
+            <Line
+              key={`grid-${index}`}
+              x1={LEFT}
+              y1={y}
+              x2={RIGHT}
+              y2={y}
+              stroke="#DFE5DF"
+              strokeWidth="1"
+              strokeDasharray="4 4"
+            />
+          );
+        })}
 
-        {horizontalLines.map((line) => (
-          <SvgText
-            key={`label-${line.value}`}
-            x="20"
-            y={line.y + 4}
-            fill="#7A847C"
-            fontSize="10"
-            fontFamily="Inter_400Regular"
-            textAnchor="middle"
-          >
-            {line.value}
-          </SvgText>
-        ))}
+        {gridValues.map((value, index) => {
+          const y = TOP + (index * (BOTTOM - TOP)) / 4;
+          return (
+            <SvgText
+              key={`label-${index}`}
+              x="20"
+              y={y + 4}
+              fill="#7A847C"
+              fontSize="10"
+              fontFamily="Inter_400Regular"
+              textAnchor="middle"
+            >
+              {value.toFixed(0)}
+            </SvgText>
+          );
+        })}
 
         <Path d={areaPath} fill="url(#humidityArea)" />
-
         <Path
           d={linePath}
           fill="none"
@@ -123,17 +130,17 @@ export function HumidityChart() {
           />
         ))}
 
-        {timeLabels.map((label) => (
+        {labels.map((label, index) => (
           <SvgText
-            key={label.value}
-            x={label.x}
+            key={`${label}-${index}`}
+            x={points[index]?.x ?? LEFT}
             y="162"
             fill="#68736B"
-            fontSize="10"
+            fontSize="9"
             fontFamily="Inter_400Regular"
             textAnchor="middle"
           >
-            {label.value}
+            {label}
           </SvgText>
         ))}
       </Svg>
