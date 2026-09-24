@@ -114,6 +114,22 @@ SECRET_KEY=una_clave_jwt_aleatoria_de_al_menos_32_caracteres
 `SECRET_KEY` debe contener al menos 32 caracteres. Los archivos `.env` no
 deben subirse a GitHub.
 
+Generar una clave secreta aleatoria con Python:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Copiar la cadena generada y reemplazar el valor de ejemplo en `.env`:
+
+```env
+SECRET_KEY=CADENA_GENERADA
+```
+
+Cada integrante puede utilizar una clave diferente en su entorno local. La
+clave debe mantenerse igual mientras se use esa instalación, porque cambiarla
+invalida los JWT existentes.
+
 ### 3. Construir e iniciar PostgreSQL y FastAPI
 
 Desde la raíz del repositorio:
