@@ -45,4 +45,9 @@ def test_batch_code_is_normalized() -> None:
 
 def test_process_requires_positive_batch_id() -> None:
     with pytest.raises(ValueError):
-        ProcesoSecadoCreate(id_lote=0)
+        ProcesoSecadoCreate(id_lote=0, id_dispositivo=1)
+
+
+def test_process_requires_positive_device_id() -> None:
+    with pytest.raises(ValueError):
+        ProcesoSecadoCreate(id_lote=1, id_dispositivo=0)

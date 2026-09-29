@@ -16,6 +16,7 @@ from app.db.database import Base
 
 if TYPE_CHECKING:
     from app.models.medicion import Medicion
+    from app.models.proceso_secado import ProcesoSecado
     from app.models.sensor import Sensor
     from app.models.usuario import Usuario
 
@@ -77,6 +78,10 @@ class Dispositivo(Base):
         lazy="selectin",
     )
     mediciones: Mapped[list[Medicion]] = relationship(
+        back_populates="dispositivo",
+        lazy="selectin",
+    )
+    procesos: Mapped[list[ProcesoSecado]] = relationship(
         back_populates="dispositivo",
         lazy="selectin",
     )

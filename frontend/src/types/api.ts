@@ -44,6 +44,7 @@ export type CoffeeBatch = {
 export type DryingProcess = {
   id_proceso: number;
   id_lote: number;
+  id_dispositivo: number | null;
   fecha_inicio: string;
   fecha_fin: string | null;
   estado: ProcessStatus;
@@ -104,5 +105,6 @@ export type CreateBatchPayload = {
 
 export type CreateProcessPayload = {
   id_lote: number;
+  id_dispositivo: number;
   observaciones?: string;
 };

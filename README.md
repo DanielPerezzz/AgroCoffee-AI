@@ -286,7 +286,8 @@ Desde la aplicación:
 3. Registrar el código, peso y humedad inicial.
 4. Seleccionar **Iniciar proceso de secado**.
 5. Elegir el lote, el dispositivo y el método.
-6. Anotar el número del proceso mostrado en el dashboard.
+6. Confirmar que el proceso aparezca como activo en el dashboard. El backend
+   conservará la asociación entre el proceso y el dispositivo seleccionado.
 
 ### 3. Exponer temporalmente FastAPI para Wokwi Web
 
@@ -309,15 +310,13 @@ Los archivos necesarios están en [`iot/wokwi`](iot/wokwi).
 1. Crear un proyecto ESP32 en <https://wokwi.com/projects/new/esp32>.
 2. Copiar `sketch.ino`, `diagram.json` y `libraries.txt` al proyecto.
 3. Crear `config.h` tomando como base `config.example.h`.
-4. Completar la URL pública, API key e identificadores reales:
+4. Completar la URL pública y la API key del dispositivo:
 
 ```cpp
 #pragma once
 
 #define API_BASE_URL "https://URL-TEMPORAL.trycloudflare.com/api/v1"
 #define DEVICE_API_KEY "API_KEY_DEL_DISPOSITIVO"
-#define DEVICE_ID 1
-#define PROCESS_ID 1
 
 #define INITIAL_ELAPSED_HOURS 36.0
 #define SIMULATED_HOUR_MS 10000UL
@@ -326,9 +325,12 @@ Los archivos necesarios están en [`iot/wokwi`](iot/wokwi).
 
 5. Iniciar la simulación y abrir el monitor serial.
 
-Cada diez segundos Wokwi enviará una medición. FastAPI la almacenará, ejecutará
-la IA y devolverá la predicción. La aplicación móvil consulta el backend cada
-diez segundos, por lo que los cambios aparecen con una pequeña demora.
+Al iniciar, Wokwi identifica el dispositivo mediante su API key y consulta el
+proceso activo que tiene asignado. No es necesario escribir manualmente el ID
+del dispositivo ni el del proceso. Cada diez segundos enviará una medición;
+FastAPI la almacenará, ejecutará la IA y devolverá la predicción. La aplicación
+móvil consulta el backend cada diez segundos, por lo que los cambios aparecen
+con una pequeña demora.
 
 La guía específica del circuito está disponible en
 [`iot/wokwi/README.md`](iot/wokwi/README.md).
@@ -402,8 +404,10 @@ docker compose down -v
 ### La API funciona, pero no aparecen datos
 
 - Comprobar que exista un proceso en estado `EN_PROCESO`.
-- Confirmar que `DEVICE_ID` y `PROCESS_ID` coincidan con PostgreSQL.
-- Revisar que la API key del dispositivo sea correcta.
+- Confirmar que el proceso tenga asignado el mismo dispositivo cuya API key se
+  configuró en Wokwi.
+- Revisar que la API key del dispositivo sea correcta y que el dispositivo esté
+  activo.
 - Mantener activos el backend, el túnel y la simulación de Wokwi.
 - Observar el monitor serial; la API debe responder con `HTTP 201`.
 

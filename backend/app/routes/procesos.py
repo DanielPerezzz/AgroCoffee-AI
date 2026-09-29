@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Response, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 
 from app.api.access import ensure_owner_or_admin, is_administrator
 from app.api.dependencies import CurrentUser, DatabaseSession
+from app.models.dispositivo import Dispositivo
 from app.models.lote_cafe import LoteCafe
 from app.models.proceso_secado import ProcesoSecado
 from app.schemas.proceso_secado import (
@@ -48,6 +49,33 @@ async def get_authorized_batch(
     return lote
 
 
+async def get_device_for_batch_or_error(
+    device_id: int,
+    lote: LoteCafe,
+    db: DatabaseSession,
+) -> Dispositivo:
+    dispositivo = await db.get(Dispositivo, device_id)
+    if dispositivo is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Dispositivo no encontrado",
+        )
+    if dispositivo.estado != "ACTIVO":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El dispositivo seleccionado no está activo",
+        )
+    if (
+        dispositivo.id_usuario is None
+        or dispositivo.id_usuario != lote.id_usuario
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="El dispositivo no pertenece al propietario del lote",
+        )
+    return dispositivo
+
+
 @router.get("", response_model=list[ProcesoSecadoResponse])
 async def list_processes(
     db: DatabaseSession,
@@ -79,17 +107,21 @@ async def create_process(
     db: DatabaseSession,
     current_user: CurrentUser,
 ) -> ProcesoSecado:
-    await get_authorized_batch(data.id_lote, db, current_user)
+    lote = await get_authorized_batch(data.id_lote, db, current_user)
+    await get_device_for_batch_or_error(data.id_dispositivo, lote, db)
     active_process = await db.scalar(
         select(ProcesoSecado).where(
-            ProcesoSecado.id_lote == data.id_lote,
             ProcesoSecado.estado.in_(ACTIVE_STATES),
+            or_(
+                ProcesoSecado.id_lote == data.id_lote,
+                ProcesoSecado.id_dispositivo == data.id_dispositivo,
+            ),
         )
     )
     if active_process is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="El lote ya tiene un proceso de secado activo",
+            detail="El lote o dispositivo ya tiene un proceso de secado activo",
         )
     values = data.model_dump(exclude_none=True)
     proceso = ProcesoSecado(**values)
