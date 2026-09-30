@@ -46,6 +46,8 @@ flowchart TD
   o `COMPLETADO`.
 - Estimación del tiempo restante y nivel de confianza.
 - Generación y atención de alertas.
+- Planes de suscripción, solicitud del servicio y seguimiento del contrato.
+- Límites de dispositivos y procesos según el plan contratado.
 - Dashboard y gráficas actualizados automáticamente cada 10 segundos.
 - Documentación interactiva OpenAPI/Swagger.
 
@@ -250,6 +252,45 @@ el acceso en redes privadas.
    `ADMINISTRADOR`.
 5. Iniciar sesión y comprobar las pantallas Inicio, Monitoreo, IA, Alertas y
    Ajustes.
+
+## Suscripciones y modelo de negocio
+
+AgroCoffee AI se plantea como un servicio mensual. El prototipo incluye los
+planes siguientes:
+
+| Plan | Mensualidad | Dispositivos | Procesos simultáneos |
+|---|---:|---:|---:|
+| Productor | $7.99 | 1 | 1 |
+| Profesional | $14.99 | 3 | 3 |
+| Empresa / Cooperativa | $39.99 | 10 | 10 |
+
+La instalación inicial estimada es de **$69.99 por dispositivo** e incluye
+configuración, vinculación y puesta en marcha. Estos valores son una propuesta
+académica y no representan cobros reales dentro de la aplicación.
+
+Después del registro, un productor puede elegir un plan y consultar el avance
+del contrato: solicitud, revisión, aprobación, programación de instalación y
+activación. Solamente las suscripciones `ACTIVA` permiten vincular dispositivos
+o iniciar procesos. El rol `ADMINISTRADOR` queda exento de esta restricción para
+gestionar y demostrar el sistema.
+
+Para cambiar el estado durante una demostración:
+
+1. Iniciar sesión como administrador en Swagger y pulsar **Authorize**.
+2. Ejecutar `GET /api/v1/suscripciones` para localizar la solicitud.
+3. Ejecutar `PATCH /api/v1/suscripciones/{id}/estado` con el estado deseado.
+
+Por ejemplo, para habilitar el servicio:
+
+```json
+{
+  "estado": "ACTIVA"
+}
+```
+
+Al activarla, la API genera el código del contrato y una vigencia inicial de
+30 días. La migración asigna además un plan demo activo por 30 días a las
+cuentas que ya existían, evitando interrumpir los datos creados previamente.
 
 Al tratarse de una instalación nueva, todavía no existirán dispositivos,
 procesos ni mediciones. La base de datos local de otro integrante no se incluye

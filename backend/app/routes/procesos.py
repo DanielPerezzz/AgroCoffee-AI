@@ -14,6 +14,7 @@ from app.schemas.proceso_secado import (
     ProcesoSecadoResponse,
     ProcesoSecadoUpdate,
 )
+from app.services.subscriptions import ensure_process_capacity
 
 
 router = APIRouter(prefix="/procesos", tags=["Procesos de secado"])
@@ -107,6 +108,7 @@ async def create_process(
     db: DatabaseSession,
     current_user: CurrentUser,
 ) -> ProcesoSecado:
+    await ensure_process_capacity(db, current_user)
     lote = await get_authorized_batch(data.id_lote, db, current_user)
     await get_device_for_batch_or_error(data.id_dispositivo, lote, db)
     active_process = await db.scalar(

@@ -12,6 +12,7 @@ from app.routes import (
     procesos,
     predicciones,
     sensores,
+    suscripciones,
     usuarios,
 )
 
@@ -21,6 +22,8 @@ api_router.include_router(auth.router)
 api_router.include_router(usuarios.router)
 api_router.include_router(dispositivos.router)
 api_router.include_router(sensores.router)
+api_router.include_router(suscripciones.plan_router)
+api_router.include_router(suscripciones.router)
 api_router.include_router(lotes.router)
 api_router.include_router(procesos.router)
 api_router.include_router(iot.router)

@@ -39,6 +39,12 @@ from app.schemas.sensor import (
     SensorResponse,
     SensorUpdate,
 )
+from app.schemas.suscripcion import (
+    PlanSuscripcionResponse,
+    SuscripcionCreate,
+    SuscripcionEstadoUpdate,
+    SuscripcionResponse,
+)
 from app.schemas.usuario import (
     UsuarioCreate,
     UsuarioRegister,
@@ -72,6 +78,10 @@ __all__ = [
     "SensorCreate",
     "SensorResponse",
     "SensorUpdate",
+    "PlanSuscripcionResponse",
+    "SuscripcionCreate",
+    "SuscripcionEstadoUpdate",
+    "SuscripcionResponse",
     "UsuarioCreate",
     "UsuarioRegister",
     "UsuarioResponse",

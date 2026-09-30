@@ -14,6 +14,7 @@ from app.schemas.dispositivo import (
     DispositivoResponse,
     DispositivoUpdate,
 )
+from app.services.subscriptions import ensure_device_capacity
 
 
 router = APIRouter(prefix="/dispositivos", tags=["Dispositivos"])
@@ -62,6 +63,7 @@ async def create_device(
     db: DatabaseSession,
     current_user: CurrentUser,
 ) -> DispositivoRegistroResponse:
+    await ensure_device_capacity(db, current_user)
     api_key = create_device_key()
     dispositivo = Dispositivo(
         **data.model_dump(),

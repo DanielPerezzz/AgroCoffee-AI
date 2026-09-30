@@ -16,6 +16,16 @@ export type DryingStatus =
 
 export type AlertLevel = "INFORMACION" | "ADVERTENCIA" | "CRITICA";
 
+export type SubscriptionStatus =
+  | "SOLICITADA"
+  | "EN_REVISION"
+  | "APROBADA"
+  | "INSTALACION_PROGRAMADA"
+  | "ACTIVA"
+  | "VENCIDA"
+  | "CANCELADA"
+  | "RECHAZADA";
+
 export type AuthTokens = {
   access_token: string;
   refresh_token: string;
@@ -60,6 +70,38 @@ export type Device = {
   ubicacion: string | null;
   fecha_registro: string;
   estado: GeneralStatus;
+};
+
+export type DeviceRegistration = {
+  dispositivo: Device;
+  api_key: string;
+};
+
+export type SubscriptionPlan = {
+  id_plan: number;
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  precio_mensual: string;
+  costo_instalacion: string;
+  limite_dispositivos: number;
+  limite_procesos_activos: number;
+  caracteristicas: string[];
+  activo: boolean;
+};
+
+export type Subscription = {
+  id_suscripcion: number;
+  id_usuario: number;
+  id_plan: number;
+  estado: SubscriptionStatus;
+  codigo_contrato: string | null;
+  fecha_solicitud: string;
+  fecha_actualizacion: string;
+  fecha_inicio: string | null;
+  fecha_fin: string | null;
+  progreso_porcentaje: number;
+  plan: SubscriptionPlan;
 };
 
 export type Measurement = {
@@ -107,4 +149,11 @@ export type CreateProcessPayload = {
   id_lote: number;
   id_dispositivo: number;
   observaciones?: string;
+};
+
+export type CreateDevicePayload = {
+  nombre: string;
+  codigo: string;
+  tipo: string;
+  ubicacion?: string;
 };

@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { HumidityChart } from "@/components/dashboard/humidity-chart";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { useProcessData } from "@/context/process-data-context";
+import { useSubscription } from "@/context/subscription-context";
 import { getDryingAppearance } from "@/utils/drying-status";
 import { formatElapsedUpdate, formatNumber, toNumber } from "@/utils/format";
 
@@ -26,6 +27,7 @@ export default function HomeScreen() {
     refreshData,
   } = useProcessData();
   const appearance = getDryingAppearance(latestPrediction?.estado_secado);
+  const { hasServiceAccess, subscription } = useSubscription();
   const history = [...measurements].reverse().slice(-9);
 
   return (
@@ -49,6 +51,8 @@ export default function HomeScreen() {
         </View>
 
         {error ? <View className="mb-5 flex-row rounded-card bg-red-50 p-4"><Ionicons name="cloud-offline-outline" size={22} color="#D13A32" /><Text className="ml-3 flex-1 font-inter text-sm text-red-700">{error}</Text></View> : null}
+
+        {!hasServiceAccess ? <Pressable className="mb-5 flex-row items-center rounded-card bg-agro-green-light p-4" onPress={() => router.push(subscription ? "/subscriptions/status" : "/subscriptions/plans")}><View className="h-11 w-11 items-center justify-center rounded-2xl bg-agro-green"><Ionicons name="card-outline" size={24} color="#FFFFFF" /></View><View className="ml-3 flex-1"><Text className="font-inter-semibold text-sm text-agro-green-dark">Activa el servicio AgroCoffee</Text><Text className="mt-1 font-inter text-xs leading-4 text-agro-muted">{subscription ? "Consulta el avance de tu contrato." : "Elige un plan para utilizar IoT e IA."}</Text></View><Ionicons name="chevron-forward" size={21} color="#2F7D32" /></Pressable> : null}
 
         {!activeProcess ? (
           <View className="rounded-card bg-white p-7 shadow-sm">

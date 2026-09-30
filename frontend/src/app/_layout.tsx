@@ -18,6 +18,7 @@ import { useEffect } from "react";
 
 import { AuthProvider, useAuth } from "@/context/auth-context";
 import { ProcessDataProvider } from "@/context/process-data-context";
+import { SubscriptionProvider } from "@/context/subscription-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,6 +39,8 @@ function RootNavigator() {
           <Stack.Screen name="batches/create" />
           <Stack.Screen name="processes/start" />
           <Stack.Screen name="devices/link" />
+          <Stack.Screen name="subscriptions/plans" />
+          <Stack.Screen name="subscriptions/status" />
           <Stack.Screen name="explore" />
         </Stack.Protected>
       </Stack>
@@ -69,9 +72,11 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <ProcessDataProvider>
-        <RootNavigator />
-      </ProcessDataProvider>
+      <SubscriptionProvider>
+        <ProcessDataProvider>
+          <RootNavigator />
+        </ProcessDataProvider>
+      </SubscriptionProvider>
     </AuthProvider>
   );
 }

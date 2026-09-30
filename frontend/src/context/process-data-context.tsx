@@ -13,8 +13,10 @@ import { useAuth } from "@/context/auth-context";
 import type {
   CoffeeBatch,
   CreateBatchPayload,
+  CreateDevicePayload,
   CreateProcessPayload,
   Device,
+  DeviceRegistration,
   DryingAlert,
   DryingProcess,
   Measurement,
@@ -37,6 +39,7 @@ type ProcessDataContextValue = {
   refreshData: (showLoader?: boolean) => Promise<void>;
   createBatch: (payload: CreateBatchPayload) => Promise<CoffeeBatch>;
   createProcess: (payload: CreateProcessPayload) => Promise<DryingProcess>;
+  createDevice: (payload: CreateDevicePayload) => Promise<DeviceRegistration>;
   markAlertAttended: (alertId: number) => Promise<void>;
 };
 
@@ -175,6 +178,22 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
     [refreshData, request]
   );
 
+  const createDevice = useCallback(
+    async (payload: CreateDevicePayload) => {
+      const registration = await request<DeviceRegistration>(
+        "/dispositivos",
+        withJsonHeaders({
+          method: "POST",
+          body: JSON.stringify(payload),
+        })
+      );
+
+      await refreshData();
+      return registration;
+    },
+    [refreshData, request]
+  );
+
   const markAlertAttended = useCallback(
     async (alertId: number) => {
       await request<DryingAlert>(
@@ -207,6 +226,7 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       refreshData,
       createBatch,
       createProcess,
+      createDevice,
       markAlertAttended,
     }),
     [
@@ -215,6 +235,7 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       batches,
       createBatch,
       createProcess,
+      createDevice,
       devices,
       error,
       isLoading,

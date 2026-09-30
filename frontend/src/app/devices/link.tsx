@@ -15,6 +15,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useProcessData } from "@/context/process-data-context";
+import { useSubscription } from "@/context/subscription-context";
+
 type InputFieldProps = {
   label: string;
   placeholder: string;
@@ -60,17 +63,34 @@ function InputField({
 
 export default function LinkDeviceScreen() {
   const router = useRouter();
+  const { createDevice } = useProcessData();
+  const { hasServiceAccess, subscription } = useSubscription();
 
   const [deviceName, setDeviceName] = useState("");
   const [deviceCode, setDeviceCode] = useState("");
   const [location, setLocation] = useState("");
   const [isLinking, setIsLinking] = useState(false);
+  const [generatedApiKey, setGeneratedApiKey] = useState<string | null>(null);
 
   const handleCodeChange = (value: string) => {
     setDeviceCode(value.toUpperCase().replace(/\s/g, ""));
   };
 
-  const handleLinkDevice = () => {
+  const handleLinkDevice = async () => {
+    if (!hasServiceAccess) {
+      Alert.alert(
+        "Suscripción requerida",
+        "Necesitas un plan activo antes de vincular un dispositivo.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Ver suscripción",
+            onPress: () => router.push(subscription ? "/subscriptions/status" : "/subscriptions/plans"),
+          },
+        ]
+      );
+      return;
+    }
     if (
       !deviceName.trim() ||
       !deviceCode.trim() ||
@@ -91,26 +111,27 @@ export default function LinkDeviceScreen() {
       return;
     }
 
-    setIsLinking(true);
-
-    /*
-     * Simulación temporal.
-     * Posteriormente se enviará la información a FastAPI.
-     */
-    setTimeout(() => {
-      setIsLinking(false);
-
+    try {
+      setIsLinking(true);
+      const registration = await createDevice({
+        nombre: deviceName.trim(),
+        codigo: deviceCode.trim(),
+        tipo: "ESP32",
+        ubicacion: location.trim(),
+      });
+      setGeneratedApiKey(registration.api_key);
       Alert.alert(
         "Dispositivo vinculado",
-        `${deviceName.trim()} fue registrado correctamente.`,
-        [
-          {
-            text: "Continuar",
-            onPress: () => router.back(),
-          },
-        ]
+        `${deviceName.trim()} fue registrado. Guarda la API key que aparece en pantalla; solo se mostrará una vez.`
       );
-    }, 1200);
+    } catch (error) {
+      Alert.alert(
+        "No fue posible vincular el dispositivo",
+        error instanceof Error ? error.message : "Intenta nuevamente."
+      );
+    } finally {
+      setIsLinking(false);
+    }
   };
 
   return (
@@ -184,7 +205,45 @@ export default function LinkDeviceScreen() {
             </Text>
           </View>
 
-          {/* Formulario */}
+          {!hasServiceAccess ? (
+            <Pressable
+              className="mb-5 flex-row items-center rounded-card bg-agro-green-light p-4"
+              onPress={() => router.push(subscription ? "/subscriptions/status" : "/subscriptions/plans")}
+            >
+              <Ionicons name="lock-closed-outline" size={23} color="#2F7D32" />
+              <Text className="ml-3 flex-1 font-inter-semibold text-sm text-agro-green-dark">
+                Activa una suscripción para registrar el ESP32.
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color="#2F7D32" />
+            </Pressable>
+          ) : null}
+
+          {/* Formulario o resultado del registro */}
+          {generatedApiKey ? (
+            <View className="rounded-card bg-white p-6 shadow-sm">
+              <View className="h-14 w-14 items-center justify-center self-center rounded-full bg-agro-green-light">
+                <Ionicons name="checkmark-circle" size={34} color="#2F7D32" />
+              </View>
+              <Text className="mt-4 text-center font-poppins-semibold text-lg text-agro-green-dark">
+                ESP32 vinculado correctamente
+              </Text>
+              <Text className="mt-2 text-center font-inter text-sm leading-5 text-agro-muted">
+                Mantén presionada la clave para seleccionarla y copiarla. La necesitarás en config.h de Wokwi.
+              </Text>
+              <View className="mt-5 rounded-2xl bg-agro-cream p-4">
+                <Text className="font-inter-semibold text-xs text-agro-muted">API KEY DEL DISPOSITIVO</Text>
+                <Text selectable className="mt-2 font-inter text-sm leading-5 text-agro-text">
+                  {generatedApiKey}
+                </Text>
+              </View>
+              <Pressable
+                className="mt-6 items-center rounded-button bg-agro-green px-6 py-4"
+                onPress={() => router.back()}
+              >
+                <Text className="font-inter-semibold text-base text-white">Finalizar</Text>
+              </Pressable>
+            </View>
+          ) : (
           <View className="rounded-card bg-white p-6 shadow-sm">
             <InputField
               label="Nombre del dispositivo"
@@ -231,8 +290,8 @@ export default function LinkDeviceScreen() {
 
             <Pressable
               className="mt-6 flex-row items-center justify-center rounded-button bg-agro-green px-6 py-4 active:bg-agro-green-dark disabled:opacity-60"
-              onPress={handleLinkDevice}
-              disabled={isLinking}
+              onPress={() => void handleLinkDevice()}
+              disabled={isLinking || !hasServiceAccess}
               accessibilityRole="button"
             >
               {isLinking ? (
@@ -258,6 +317,7 @@ export default function LinkDeviceScreen() {
               )}
             </Pressable>
           </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
