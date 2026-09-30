@@ -41,6 +41,7 @@ function RootNavigator() {
           <Stack.Screen name="devices/link" />
           <Stack.Screen name="subscriptions/plans" />
           <Stack.Screen name="subscriptions/status" />
+          <Stack.Screen name="ai/chat" />
           <Stack.Screen name="explore" />
         </Stack.Protected>
       </Stack>

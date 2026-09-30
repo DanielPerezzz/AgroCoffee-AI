@@ -25,6 +25,7 @@ import type {
 
 type ProcessDataContextValue = {
   activeProcess: DryingProcess | null;
+  processes: DryingProcess[];
   batches: CoffeeBatch[];
   devices: Device[];
   measurements: Measurement[];
@@ -37,6 +38,7 @@ type ProcessDataContextValue = {
   error: string | null;
   refreshedAt: Date | null;
   refreshData: (showLoader?: boolean) => Promise<void>;
+  selectProcess: (processId: number) => void;
   createBatch: (payload: CreateBatchPayload) => Promise<CoffeeBatch>;
   createProcess: (payload: CreateProcessPayload) => Promise<DryingProcess>;
   createDevice: (payload: CreateDevicePayload) => Promise<DeviceRegistration>;
@@ -48,6 +50,8 @@ const ProcessDataContext = createContext<ProcessDataContextValue | null>(null);
 export function ProcessDataProvider({ children }: PropsWithChildren) {
   const { isAuthenticated, request } = useAuth();
   const [activeProcess, setActiveProcess] = useState<DryingProcess | null>(null);
+  const [processes, setProcesses] = useState<DryingProcess[]>([]);
+  const [selectedProcessId, setSelectedProcessId] = useState<number | null>(null);
   const [batches, setBatches] = useState<CoffeeBatch[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
@@ -60,6 +64,8 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
 
   const clearData = useCallback(() => {
     setActiveProcess(null);
+    setProcesses([]);
+    setSelectedProcessId(null);
     setBatches([]);
     setDevices([]);
     setMeasurements([]);
@@ -88,13 +94,18 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
           request<Device[]>("/dispositivos?limit=100"),
         ]);
 
-        const process = [...processList]
+        const availableProcesses = [...processList]
           .sort((a, b) => b.id_proceso - a.id_proceso)
-          .find((item) =>
+          .filter((item) =>
             ["EN_PROCESO", "PAUSADO"].includes(item.estado)
-          ) ?? null;
+          );
+        const process =
+          availableProcesses.find(
+            (item) => item.id_proceso === selectedProcessId
+          ) ?? availableProcesses[0] ?? null;
 
         setActiveProcess(process);
+        setProcesses(availableProcesses);
         setBatches(batchList);
         setDevices(deviceList);
 
@@ -129,8 +140,12 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
         setIsRefreshing(false);
       }
     },
-    [clearData, isAuthenticated, request]
+    [clearData, isAuthenticated, request, selectedProcessId]
   );
+
+  const selectProcess = useCallback((processId: number) => {
+    setSelectedProcessId(processId);
+  }, []);
 
   useEffect(() => {
     void refreshData();
@@ -212,6 +227,7 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
   const value = useMemo<ProcessDataContextValue>(
     () => ({
       activeProcess,
+      processes,
       batches,
       devices,
       measurements,
@@ -224,6 +240,7 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       error,
       refreshedAt,
       refreshData,
+      selectProcess,
       createBatch,
       createProcess,
       createDevice,
@@ -243,8 +260,10 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       markAlertAttended,
       measurements,
       predictions,
+      processes,
       refreshData,
       refreshedAt,
+      selectProcess,
     ]
   );
 

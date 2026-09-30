@@ -139,6 +139,20 @@ export type DryingAlert = {
   fecha_atencion: string | null;
 };
 
+export type AIChatContext = {
+  id_proceso: number;
+  id_medicion: number | null;
+  fecha_medicion: string | null;
+  modelo_version: string | null;
+};
+
+export type AIChatResponse = {
+  respuesta: string;
+  intencion: string;
+  sugerencias: string[];
+  contexto: AIChatContext;
+};
+
 export type CreateBatchPayload = {
   codigo_lote: string;
   cantidad_kg: number;

@@ -1,7 +1,8 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import type { ComponentProps } from "react";
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useProcessData } from "@/context/process-data-context";
@@ -39,6 +40,7 @@ function Variable({
 }
 
 export default function AIScreen() {
+  const router = useRouter();
   const {
     latestMeasurement: measurement,
     latestPrediction: prediction,
@@ -203,6 +205,29 @@ export default function AIScreen() {
             </Text>
           </>
         )}
+
+        <Pressable
+          className="mt-6 flex-row items-center rounded-card bg-agro-green-dark p-5 active:opacity-80"
+          onPress={() => router.push("/ai/chat")}
+          accessibilityRole="button"
+        >
+          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white/15">
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={30}
+              color="#FFFFFF"
+            />
+          </View>
+          <View className="ml-4 flex-1">
+            <Text className="font-poppins-semibold text-lg text-white">
+              Conversar con la IA
+            </Text>
+            <Text className="mt-1 font-inter text-xs leading-5 text-white/75">
+              Pregunta por el estado, las variables, alertas o recomendaciones.
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );

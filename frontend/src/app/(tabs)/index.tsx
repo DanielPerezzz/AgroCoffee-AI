@@ -18,6 +18,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const {
     activeProcess,
+    processes,
     error,
     isRefreshing,
     latestMeasurement,
@@ -25,6 +26,7 @@ export default function HomeScreen() {
     measurements,
     refreshedAt,
     refreshData,
+    selectProcess,
   } = useProcessData();
   const appearance = getDryingAppearance(latestPrediction?.estado_secado);
   const { hasServiceAccess, subscription } = useSubscription();
@@ -51,6 +53,53 @@ export default function HomeScreen() {
         </View>
 
         {error ? <View className="mb-5 flex-row rounded-card bg-red-50 p-4"><Ionicons name="cloud-offline-outline" size={22} color="#D13A32" /><Text className="ml-3 flex-1 font-inter text-sm text-red-700">{error}</Text></View> : null}
+
+        {processes.length > 1 ? (
+          <View className="mb-5">
+            <View className="mb-3 flex-row items-center">
+              <Ionicons name="swap-horizontal-outline" size={20} color="#2F7D32" />
+              <Text className="ml-2 font-poppins-semibold text-sm text-agro-text">
+                Proceso mostrado
+              </Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: 12 }}
+            >
+              {processes.map((process) => {
+                const selected = process.id_proceso === activeProcess?.id_proceso;
+                return (
+                  <Pressable
+                    key={process.id_proceso}
+                    className={`mr-3 min-w-32 rounded-2xl border px-4 py-3 active:opacity-70 ${
+                      selected
+                        ? "border-agro-green bg-agro-green"
+                        : "border-black/10 bg-white"
+                    }`}
+                    onPress={() => selectProcess(process.id_proceso)}
+                    accessibilityRole="button"
+                  >
+                    <Text
+                      className={`font-poppins-semibold text-sm ${
+                        selected ? "text-white" : "text-agro-text"
+                      }`}
+                    >
+                      Proceso #{process.id_proceso}
+                    </Text>
+                    <Text
+                      className={`mt-1 font-inter text-xs ${
+                        selected ? "text-white/75" : "text-agro-muted"
+                      }`}
+                    >
+                      {process.estado.replaceAll("_", " ")}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        ) : null}
 
         {!hasServiceAccess ? <Pressable className="mb-5 flex-row items-center rounded-card bg-agro-green-light p-4" onPress={() => router.push(subscription ? "/subscriptions/status" : "/subscriptions/plans")}><View className="h-11 w-11 items-center justify-center rounded-2xl bg-agro-green"><Ionicons name="card-outline" size={24} color="#FFFFFF" /></View><View className="ml-3 flex-1"><Text className="font-inter-semibold text-sm text-agro-green-dark">Activa el servicio AgroCoffee</Text><Text className="mt-1 font-inter text-xs leading-4 text-agro-muted">{subscription ? "Consulta el avance de tu contrato." : "Elige un plan para utilizar IoT e IA."}</Text></View><Ionicons name="chevron-forward" size={21} color="#2F7D32" /></Pressable> : null}
 

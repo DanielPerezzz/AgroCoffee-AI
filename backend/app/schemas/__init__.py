@@ -16,6 +16,11 @@ from app.schemas.dispositivo import (
     DispositivoResponse,
     DispositivoUpdate,
 )
+from app.schemas.ia_chat import (
+    IAChatContext,
+    IAChatRequest,
+    IAChatResponse,
+)
 from app.schemas.lote_cafe import (
     LoteCafeCreate,
     LoteCafeResponse,
@@ -65,6 +70,9 @@ __all__ = [
     "DispositivoRegistroResponse",
     "DispositivoResponse",
     "DispositivoUpdate",
+    "IAChatContext",
+    "IAChatRequest",
+    "IAChatResponse",
     "LoteCafeCreate",
     "LoteCafeResponse",
     "LoteCafeUpdate",
