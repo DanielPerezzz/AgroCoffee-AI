@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agrocoffee-config
+  namespace: agrocoffee
+data:
+  APP_NAME: "AgroCoffee AI API"
+  APP_VERSION: "0.3.0"
+  API_V1_PREFIX: "/api/v1"
+  ENVIRONMENT: "kubernetes"
+  SQL_ECHO: "false"
+  JWT_ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "15"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
