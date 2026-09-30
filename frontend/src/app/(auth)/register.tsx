@@ -39,7 +39,7 @@ export default function RegisterScreen() {
         correo: email.trim().toLowerCase(),
         password,
       });
-      router.replace("/(tabs)");
+      router.replace("/subscriptions/plans");
     } catch (error) {
       Alert.alert(
         "No fue posible crear la cuenta",

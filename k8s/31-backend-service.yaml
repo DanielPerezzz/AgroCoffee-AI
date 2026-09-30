@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agrocoffee-backend
+  namespace: agrocoffee
+  labels:
+    app.kubernetes.io/name: agrocoffee-backend
+    app.kubernetes.io/part-of: agrocoffee-ai
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: agrocoffee-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

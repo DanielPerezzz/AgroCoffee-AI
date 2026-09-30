@@ -11,6 +11,8 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
+COPY alembic.ini ./alembic.ini
+COPY alembic ./alembic
 
 # Entrena modelos reproducibles durante la construcción de la imagen.
 RUN python -m app.ml.train --output-dir /app/app/ml/artifacts

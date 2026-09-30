@@ -20,6 +20,8 @@ constexpr int BUZZER_PIN = 14;
 DHTesp dhtSensor;
 unsigned long simulationStartedAt = 0;
 unsigned long lastSendAt = 0;
+long activeDeviceId = -1;
+long activeProcessId = -1;
 
 void setOutputs(bool green, bool yellow, bool red) {
   digitalWrite(GREEN_LED_PIN, green ? HIGH : LOW);
@@ -122,7 +124,94 @@ int postJson(const String &url, const String &payload, String &response) {
   return statusCode;
 }
 
+int getJson(const String &url, String &response) {
+  HTTPClient http;
+  int statusCode = -1;
+
+  if (url.startsWith("https://")) {
+    WiFiClientSecure client;
+    client.setInsecure();  // Únicamente para el túnel temporal de demostración.
+    if (!http.begin(client, url)) {
+      return -1;
+    }
+    http.addHeader("X-Device-Key", DEVICE_API_KEY);
+    http.setTimeout(12000);
+    statusCode = http.GET();
+    response = http.getString();
+    http.end();
+    return statusCode;
+  }
+
+  WiFiClient client;
+  if (!http.begin(client, url)) {
+    return -1;
+  }
+  http.addHeader("X-Device-Key", DEVICE_API_KEY);
+  http.setTimeout(12000);
+  statusCode = http.GET();
+  response = http.getString();
+  http.end();
+  return statusCode;
+}
+
+float jsonFloat(JsonVariantConst value) {
+  if (value.is<const char *>()) {
+    return String(value.as<const char *>()).toFloat();
+  }
+  return value.as<float>();
+}
+
+bool resolveActiveContext() {
+  String response;
+  String endpoint = String(API_BASE_URL) + "/iot/contexto";
+  int statusCode = getJson(endpoint, response);
+
+  Serial.printf("Contexto HTTP %d\n", statusCode);
+  if (statusCode != 200) {
+    Serial.println(response);
+    activeDeviceId = -1;
+    activeProcessId = -1;
+    showConnectionError();
+    return false;
+  }
+
+  JsonDocument document;
+  DeserializationError error = deserializeJson(document, response);
+  if (error) {
+    Serial.printf("Contexto JSON inválido: %s\n", error.c_str());
+    activeDeviceId = -1;
+    activeProcessId = -1;
+    showConnectionError();
+    return false;
+  }
+
+  activeDeviceId = document["id_dispositivo"] | -1;
+  activeProcessId = document["id_proceso"] | -1;
+  const char *deviceCode = document["codigo_dispositivo"] | "SIN_CODIGO";
+  const char *batchCode = document["codigo_lote"] | "SIN_LOTE";
+
+  if (activeDeviceId <= 0 || activeProcessId <= 0) {
+    Serial.println("El contexto recibido no contiene identificadores válidos");
+    showConnectionError();
+    return false;
+  }
+
+  Serial.printf(
+      "Contexto activo: dispositivo %s (#%ld), lote %s, proceso #%ld\n",
+      deviceCode,
+      activeDeviceId,
+      batchCode,
+      activeProcessId
+  );
+  return true;
+}
+
 void sendMeasurement() {
+  if (activeProcessId <= 0 && !resolveActiveContext()) {
+    Serial.println("No se enviará la medición hasta tener un proceso activo");
+    return;
+  }
+
   TempAndHumidity dhtData = dhtSensor.getTempAndHumidity();
   if (isnan(dhtData.temperature) || isnan(dhtData.humidity)) {
     Serial.println("Error leyendo el DHT22");
@@ -135,8 +224,6 @@ void sendMeasurement() {
   float elapsedHours = simulatedElapsedHours();
 
   JsonDocument requestDocument;
-  requestDocument["id_proceso"] = PROCESS_ID;
-  requestDocument["id_dispositivo"] = DEVICE_ID;
   requestDocument["temperatura"] = round(dhtData.temperature * 100.0f) / 100.0f;
   requestDocument["humedad_ambiental"] = round(dhtData.humidity * 100.0f) / 100.0f;
   requestDocument["humedad_cafe"] = round(coffeeHumidity * 100.0f) / 100.0f;
@@ -158,6 +245,7 @@ void sendMeasurement() {
   Serial.println(response);
 
   if (statusCode != 201) {
+    activeProcessId = -1;
     showConnectionError();
     return;
   }
@@ -171,10 +259,12 @@ void sendMeasurement() {
   }
 
   String state = responseDocument["prediccion"]["estado_secado"] | "SIN_DATOS";
-  float remainingHours =
-      responseDocument["prediccion"]["tiempo_restante_horas"] | 0.0f;
-  float confidence =
-      responseDocument["prediccion"]["nivel_confianza"] | 0.0f;
+  float remainingHours = jsonFloat(
+      responseDocument["prediccion"]["tiempo_restante_horas"]
+  );
+  float confidence = jsonFloat(
+      responseDocument["prediccion"]["nivel_confianza"]
+  );
 
   Serial.printf(
       "IA: %s | Restante: %.2f h | Confianza: %.2f%%\n",
@@ -202,6 +292,7 @@ void setup() {
   simulationStartedAt = millis();
   lastSendAt = millis() - SEND_INTERVAL_MS;
   Serial.println("AgroCoffee IoT listo");
+  resolveActiveContext();
 }
 
 void loop() {

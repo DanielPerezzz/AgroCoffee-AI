@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.dispositivo import Dispositivo
     from app.models.lote_cafe import LoteCafe
     from app.models.refresh_token import RefreshToken
+    from app.models.suscripcion import Suscripcion
 
 
 class Usuario(Base):
@@ -67,6 +68,12 @@ class Usuario(Base):
     )
 
     refresh_tokens: Mapped[list[RefreshToken]] = relationship(
+        back_populates="usuario",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        lazy="selectin",
+    )
+    suscripciones: Mapped[list[Suscripcion]] = relationship(
         back_populates="usuario",
         cascade="all, delete-orphan",
         passive_deletes=True,

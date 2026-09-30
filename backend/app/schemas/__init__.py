@@ -16,6 +16,11 @@ from app.schemas.dispositivo import (
     DispositivoResponse,
     DispositivoUpdate,
 )
+from app.schemas.ia_chat import (
+    IAChatContext,
+    IAChatRequest,
+    IAChatResponse,
+)
 from app.schemas.lote_cafe import (
     LoteCafeCreate,
     LoteCafeResponse,
@@ -39,6 +44,12 @@ from app.schemas.sensor import (
     SensorResponse,
     SensorUpdate,
 )
+from app.schemas.suscripcion import (
+    PlanSuscripcionResponse,
+    SuscripcionCreate,
+    SuscripcionEstadoUpdate,
+    SuscripcionResponse,
+)
 from app.schemas.usuario import (
     UsuarioCreate,
     UsuarioRegister,
@@ -59,6 +70,9 @@ __all__ = [
     "DispositivoRegistroResponse",
     "DispositivoResponse",
     "DispositivoUpdate",
+    "IAChatContext",
+    "IAChatRequest",
+    "IAChatResponse",
     "LoteCafeCreate",
     "LoteCafeResponse",
     "LoteCafeUpdate",
@@ -72,6 +86,10 @@ __all__ = [
     "SensorCreate",
     "SensorResponse",
     "SensorUpdate",
+    "PlanSuscripcionResponse",
+    "SuscripcionCreate",
+    "SuscripcionEstadoUpdate",
+    "SuscripcionResponse",
     "UsuarioCreate",
     "UsuarioRegister",
     "UsuarioResponse",

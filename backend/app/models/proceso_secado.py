@@ -18,6 +18,7 @@ from app.db.database import Base
 
 if TYPE_CHECKING:
     from app.models.alerta import Alerta
+    from app.models.dispositivo import Dispositivo
     from app.models.lote_cafe import LoteCafe
     from app.models.medicion import Medicion
 
@@ -43,6 +44,14 @@ class ProcesoSecado(Base):
         ),
         nullable=False,
     )
+    id_dispositivo: Mapped[int | None] = mapped_column(
+        ForeignKey(
+            "dispositivo.id_dispositivo",
+            ondelete="RESTRICT",
+        ),
+        nullable=True,
+        index=True,
+    )
     fecha_inicio: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -64,6 +73,10 @@ class ProcesoSecado(Base):
     )
 
     lote: Mapped[LoteCafe] = relationship(
+        back_populates="procesos",
+        lazy="selectin",
+    )
+    dispositivo: Mapped[Dispositivo | None] = relationship(
         back_populates="procesos",
         lazy="selectin",
     )

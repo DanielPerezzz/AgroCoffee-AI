@@ -1,11 +1,14 @@
-import Ionicons from "@react-native-vector-icons/ionicons";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { ImageBackground, Text, View } from "react-native";
 
 import { useAuth } from "@/context/auth-context";
+
+const splashBackground = require("../../assets/brand/splash-background.jpg");
+const brandLogo = require("../../assets/brand/agrocoffee-logo.png");
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -24,67 +27,64 @@ export default function SplashScreen() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <LinearGradient
-  colors={["#173E24", "#2F7D32", "#65A64C"]}
-  style={{
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  }}
->
-      <StatusBar style="light" />
-
-      <View
-        className="absolute rounded-full bg-white/5"
+    <ImageBackground
+      source={splashBackground}
+      resizeMode="cover"
+      style={{ flex: 1 }}
+    >
+      <LinearGradient
+        colors={[
+          "rgba(11, 48, 28, 0.34)",
+          "rgba(18, 78, 42, 0.08)",
+          "rgba(11, 48, 28, 0.82)",
+        ]}
+        locations={[0, 0.48, 1]}
         style={{
-          width: 320,
-          height: 320,
-          top: -100,
-          right: -120,
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 24,
         }}
-      />
+      >
+        <StatusBar style="light" />
 
-      <View
-        className="absolute rounded-full bg-agro-yellow/10"
-        style={{
-          width: 260,
-          height: 260,
-          bottom: -80,
-          left: -100,
-        }}
-      />
+        <View
+          className="w-full max-w-sm items-center rounded-card border border-white/50 px-7 py-8"
+          style={{ backgroundColor: "rgba(247, 245, 237, 0.90)" }}
+        >
+          <Image
+            source={brandLogo}
+            contentFit="contain"
+            style={{ width: 82, height: 104 }}
+            accessibilityLabel="Logo oficial de AgroCoffee AI"
+          />
 
-      <View className="h-32 w-32 items-center justify-center rounded-full border border-white/30 bg-white/15">
-        <Ionicons name="leaf-outline" size={70} color="#FFFFFF" />
-      </View>
+          <View className="mt-5 flex-row items-center">
+            <Text className="font-poppins-bold text-4xl text-agro-green-dark">
+              Agro
+            </Text>
+            <Text className="font-poppins-bold text-4xl text-agro-coffee">
+              Coffee
+            </Text>
+            <Text className="font-poppins-bold text-4xl text-agro-green-dark">
+              {" "}AI
+            </Text>
+          </View>
 
-      <View className="mt-8 flex-row items-center">
-        <Text className="font-poppins-bold text-4xl text-white">
-          Agro
-        </Text>
-
-        <Text className="font-poppins-bold text-4xl text-agro-yellow">
-          Coffee
-        </Text>
-
-        <Text className="font-poppins-bold text-4xl text-white">
-          {" "}AI
-        </Text>
-      </View>
-
-      <Text className="mt-4 px-10 text-center font-inter text-base leading-6 text-white/80">
-        Inteligencia artificial e IoT para un secado de café más preciso
-      </Text>
-
-      <View className="absolute bottom-14 items-center">
-        <View className="h-1.5 w-28 overflow-hidden rounded-full bg-white/20">
-          <View className="h-full w-2/3 rounded-full bg-agro-yellow" />
+          <Text className="mt-3 text-center font-inter text-sm leading-6 text-agro-muted">
+            Inteligencia artificial e IoT para un secado de café más preciso
+          </Text>
         </View>
 
-        <Text className="mt-4 font-inter text-xs text-white/60">
-          Preparando el monitoreo
-        </Text>
-      </View>
-    </LinearGradient>
+        <View className="absolute bottom-14 items-center">
+          <View className="h-1.5 w-28 overflow-hidden rounded-full bg-white/30">
+            <View className="h-full w-2/3 rounded-full bg-agro-yellow" />
+          </View>
+          <Text className="mt-4 font-inter-medium text-xs text-white/90">
+            Preparando el monitoreo
+          </Text>
+        </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }

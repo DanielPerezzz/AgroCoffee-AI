@@ -8,6 +8,7 @@ from app.schemas.enums import EstadoProceso
 
 class ProcesoSecadoCreate(AgroCoffeeSchema):
     id_lote: int = Field(gt=0)
+    id_dispositivo: int = Field(gt=0)
     fecha_inicio: datetime | None = None
     observaciones: str | None = Field(
         default=None,
@@ -27,6 +28,7 @@ class ProcesoSecadoUpdate(AgroCoffeeSchema):
 class ProcesoSecadoResponse(AgroCoffeeSchema):
     id_proceso: int
     id_lote: int
+    id_dispositivo: int | None
     fecha_inicio: datetime
     fecha_fin: datetime | None
     estado: EstadoProceso

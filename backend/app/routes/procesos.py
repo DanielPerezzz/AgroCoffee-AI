@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Response, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 
 from app.api.access import ensure_owner_or_admin, is_administrator
 from app.api.dependencies import CurrentUser, DatabaseSession
+from app.models.dispositivo import Dispositivo
 from app.models.lote_cafe import LoteCafe
 from app.models.proceso_secado import ProcesoSecado
 from app.schemas.proceso_secado import (
@@ -13,6 +14,8 @@ from app.schemas.proceso_secado import (
     ProcesoSecadoResponse,
     ProcesoSecadoUpdate,
 )
+from app.services.subscriptions import ensure_process_capacity
+from app.services.process_lifecycle import validate_process_transition
 
 
 router = APIRouter(prefix="/procesos", tags=["Procesos de secado"])
@@ -48,6 +51,33 @@ async def get_authorized_batch(
     return lote
 
 
+async def get_device_for_batch_or_error(
+    device_id: int,
+    lote: LoteCafe,
+    db: DatabaseSession,
+) -> Dispositivo:
+    dispositivo = await db.get(Dispositivo, device_id)
+    if dispositivo is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Dispositivo no encontrado",
+        )
+    if dispositivo.estado != "ACTIVO":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El dispositivo seleccionado no está activo",
+        )
+    if (
+        dispositivo.id_usuario is None
+        or dispositivo.id_usuario != lote.id_usuario
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="El dispositivo no pertenece al propietario del lote",
+        )
+    return dispositivo
+
+
 @router.get("", response_model=list[ProcesoSecadoResponse])
 async def list_processes(
     db: DatabaseSession,
@@ -79,17 +109,22 @@ async def create_process(
     db: DatabaseSession,
     current_user: CurrentUser,
 ) -> ProcesoSecado:
-    await get_authorized_batch(data.id_lote, db, current_user)
+    await ensure_process_capacity(db, current_user)
+    lote = await get_authorized_batch(data.id_lote, db, current_user)
+    await get_device_for_batch_or_error(data.id_dispositivo, lote, db)
     active_process = await db.scalar(
         select(ProcesoSecado).where(
-            ProcesoSecado.id_lote == data.id_lote,
             ProcesoSecado.estado.in_(ACTIVE_STATES),
+            or_(
+                ProcesoSecado.id_lote == data.id_lote,
+                ProcesoSecado.id_dispositivo == data.id_dispositivo,
+            ),
         )
     )
     if active_process is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="El lote ya tiene un proceso de secado activo",
+            detail="El lote o dispositivo ya tiene un proceso de secado activo",
         )
     values = data.model_dump(exclude_none=True)
     proceso = ProcesoSecado(**values)
@@ -121,19 +156,22 @@ async def update_process(
     await get_authorized_batch(proceso.id_lote, db, current_user)
     changes = data.model_dump(exclude_unset=True)
     new_state = changes.get("estado")
-    if proceso.estado in FINAL_STATES and new_state not in (None, proceso.estado):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Un proceso finalizado o cancelado no puede reactivarse",
-        )
-    if new_state in FINAL_STATES and "fecha_fin" not in changes:
+    if new_state is not None:
+        validate_process_transition(proceso.estado, new_state)
+
+    target_state = new_state or proceso.estado
+    if (
+        target_state in FINAL_STATES
+        and changes.get("fecha_fin", proceso.fecha_fin) is None
+    ):
         changes["fecha_fin"] = datetime.now(timezone.utc)
-    if new_state in ACTIVE_STATES and changes.get("fecha_fin") is not None:
+
+    final_date = changes.get("fecha_fin", proceso.fecha_fin)
+    if target_state in ACTIVE_STATES and final_date is not None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Un proceso activo no puede tener fecha de finalización",
         )
-    final_date = changes.get("fecha_fin", proceso.fecha_fin)
     if final_date is not None and final_date < proceso.fecha_inicio:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

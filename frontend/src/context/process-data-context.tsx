@@ -13,8 +13,10 @@ import { useAuth } from "@/context/auth-context";
 import type {
   CoffeeBatch,
   CreateBatchPayload,
+  CreateDevicePayload,
   CreateProcessPayload,
   Device,
+  DeviceRegistration,
   DryingAlert,
   DryingProcess,
   Measurement,
@@ -23,6 +25,8 @@ import type {
 
 type ProcessDataContextValue = {
   activeProcess: DryingProcess | null;
+  processes: DryingProcess[];
+  processHistory: DryingProcess[];
   batches: CoffeeBatch[];
   devices: Device[];
   measurements: Measurement[];
@@ -35,8 +39,14 @@ type ProcessDataContextValue = {
   error: string | null;
   refreshedAt: Date | null;
   refreshData: (showLoader?: boolean) => Promise<void>;
+  selectProcess: (processId: number) => void;
   createBatch: (payload: CreateBatchPayload) => Promise<CoffeeBatch>;
   createProcess: (payload: CreateProcessPayload) => Promise<DryingProcess>;
+  updateProcessStatus: (
+    processId: number,
+    status: DryingProcess["estado"]
+  ) => Promise<DryingProcess>;
+  createDevice: (payload: CreateDevicePayload) => Promise<DeviceRegistration>;
   markAlertAttended: (alertId: number) => Promise<void>;
 };
 
@@ -45,6 +55,9 @@ const ProcessDataContext = createContext<ProcessDataContextValue | null>(null);
 export function ProcessDataProvider({ children }: PropsWithChildren) {
   const { isAuthenticated, request } = useAuth();
   const [activeProcess, setActiveProcess] = useState<DryingProcess | null>(null);
+  const [processes, setProcesses] = useState<DryingProcess[]>([]);
+  const [processHistory, setProcessHistory] = useState<DryingProcess[]>([]);
+  const [selectedProcessId, setSelectedProcessId] = useState<number | null>(null);
   const [batches, setBatches] = useState<CoffeeBatch[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
@@ -57,6 +70,9 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
 
   const clearData = useCallback(() => {
     setActiveProcess(null);
+    setProcesses([]);
+    setProcessHistory([]);
+    setSelectedProcessId(null);
     setBatches([]);
     setDevices([]);
     setMeasurements([]);
@@ -85,13 +101,21 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
           request<Device[]>("/dispositivos?limit=100"),
         ]);
 
-        const process = [...processList]
+        const availableProcesses = [...processList]
           .sort((a, b) => b.id_proceso - a.id_proceso)
-          .find((item) =>
+          .filter((item) =>
             ["EN_PROCESO", "PAUSADO"].includes(item.estado)
-          ) ?? null;
+          );
+        const process =
+          availableProcesses.find(
+            (item) => item.id_proceso === selectedProcessId
+          ) ?? availableProcesses[0] ?? null;
 
         setActiveProcess(process);
+        setProcesses(availableProcesses);
+        setProcessHistory(
+          [...processList].sort((a, b) => b.id_proceso - a.id_proceso)
+        );
         setBatches(batchList);
         setDevices(deviceList);
 
@@ -126,8 +150,12 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
         setIsRefreshing(false);
       }
     },
-    [clearData, isAuthenticated, request]
+    [clearData, isAuthenticated, request, selectedProcessId]
   );
+
+  const selectProcess = useCallback((processId: number) => {
+    setSelectedProcessId(processId);
+  }, []);
 
   useEffect(() => {
     void refreshData();
@@ -175,6 +203,47 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
     [refreshData, request]
   );
 
+  const createDevice = useCallback(
+    async (payload: CreateDevicePayload) => {
+      const registration = await request<DeviceRegistration>(
+        "/dispositivos",
+        withJsonHeaders({
+          method: "POST",
+          body: JSON.stringify(payload),
+        })
+      );
+
+      await refreshData();
+      return registration;
+    },
+    [refreshData, request]
+  );
+
+  const updateProcessStatus = useCallback(
+    async (
+      processId: number,
+      processStatus: DryingProcess["estado"]
+    ) => {
+      const process = await request<DryingProcess>(
+        `/procesos/${processId}`,
+        withJsonHeaders({
+          method: "PATCH",
+          body: JSON.stringify({ estado: processStatus }),
+        })
+      );
+
+      if (["FINALIZADO", "CANCELADO"].includes(processStatus)) {
+        setSelectedProcessId(null);
+      } else {
+        setSelectedProcessId(processId);
+      }
+
+      await refreshData();
+      return process;
+    },
+    [refreshData, request]
+  );
+
   const markAlertAttended = useCallback(
     async (alertId: number) => {
       await request<DryingAlert>(
@@ -193,6 +262,8 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
   const value = useMemo<ProcessDataContextValue>(
     () => ({
       activeProcess,
+      processes,
+      processHistory,
       batches,
       devices,
       measurements,
@@ -205,8 +276,11 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       error,
       refreshedAt,
       refreshData,
+      selectProcess,
       createBatch,
       createProcess,
+      updateProcessStatus,
+      createDevice,
       markAlertAttended,
     }),
     [
@@ -215,6 +289,7 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       batches,
       createBatch,
       createProcess,
+      createDevice,
       devices,
       error,
       isLoading,
@@ -222,8 +297,12 @@ export function ProcessDataProvider({ children }: PropsWithChildren) {
       markAlertAttended,
       measurements,
       predictions,
+      processHistory,
+      processes,
       refreshData,
       refreshedAt,
+      selectProcess,
+      updateProcessStatus,
     ]
   );
 
