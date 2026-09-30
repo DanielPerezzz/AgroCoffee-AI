@@ -1,4 +1,5 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -16,6 +17,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/auth-context";
+
+const brandLogo = require("../../../assets/brand/agrocoffee-logo.png");
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -79,11 +82,12 @@ export default function LoginScreen() {
           >
             {/* Encabezado */}
             <View className="mb-8 items-center">
-              <View className="h-20 w-20 items-center justify-center rounded-full bg-agro-green">
-                <Ionicons
-                  name="leaf-outline"
-                  size={44}
-                  color="#FFFFFF"
+              <View className="h-24 w-24 items-center justify-center rounded-3xl border border-agro-green/10 bg-agro-cream shadow-sm">
+                <Image
+                  source={brandLogo}
+                  contentFit="contain"
+                  style={{ width: 52, height: 66 }}
+                  accessibilityLabel="Logo oficial de AgroCoffee AI"
                 />
               </View>
 

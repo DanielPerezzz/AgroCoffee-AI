@@ -1,4 +1,5 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
@@ -9,6 +10,8 @@ import { MetricCard } from "@/components/dashboard/metric-card";
 import { useProcessData } from "@/context/process-data-context";
 import { getDryingAppearance } from "@/utils/drying-status";
 import { formatElapsedUpdate, formatNumber, toNumber } from "@/utils/format";
+
+const brandLogo = require("../../../assets/brand/agrocoffee-logo.png");
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -36,7 +39,7 @@ export default function HomeScreen() {
       >
         <View className="mb-6 flex-row items-center justify-between">
           <View className="flex-row items-center">
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-agro-green"><Ionicons name="leaf-outline" size={27} color="#FFFFFF" /></View>
+            <View className="h-12 w-12 items-center justify-center rounded-2xl border border-agro-green/10 bg-white"><Image source={brandLogo} contentFit="contain" style={{ width: 25, height: 32 }} accessibilityLabel="Logo de AgroCoffee AI" /></View>
             <View className="ml-3">
               <Text className="font-poppins-bold text-xl text-agro-green-dark">AgroCoffee AI</Text>
               <Text className="font-inter text-xs text-agro-muted">{activeProcess ? `Proceso #${activeProcess.id_proceso} activo` : "Sin proceso activo"}</Text>
