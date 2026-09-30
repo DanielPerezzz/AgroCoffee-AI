@@ -18,6 +18,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const {
     activeProcess,
+    processHistory,
     processes,
     error,
     isRefreshing,
@@ -109,6 +110,7 @@ export default function HomeScreen() {
             <Text className="mt-4 text-center font-poppins-semibold text-xl text-agro-text">Comienza un proceso</Text>
             <Text className="mt-2 text-center font-inter text-sm leading-5 text-agro-muted">Crea un lote e inicia su secado para visualizar las mediciones del ESP32 y las predicciones de IA.</Text>
             <Pressable className="mt-5 items-center rounded-button bg-agro-green px-5 py-4" onPress={() => router.push("/batches/create")}><Text className="font-inter-semibold text-white">Crear lote de café</Text></Pressable>
+            {processHistory.length > 0 ? <Pressable className="mt-3 flex-row items-center justify-center rounded-button border border-agro-green bg-white px-5 py-4" onPress={() => router.push("/processes/history")}><Ionicons name="time-outline" size={21} color="#2F7D32" /><Text className="ml-2 font-inter-semibold text-agro-green-dark">Ver historial de procesos</Text></Pressable> : null}
           </View>
         ) : (
           <>
@@ -128,6 +130,7 @@ export default function HomeScreen() {
               <MetricCard title="Tiempo transcurrido" value={`${formatNumber(latestMeasurement?.tiempo_transcurrido_horas)} h`} icon="time-outline" iconColor="#7957D5" iconBackground="#F0EBFF" description="Desde el inicio del proceso" wide />
             </View>
             {history.length > 0 ? <View className="mt-3"><HumidityChart values={history.map((item) => toNumber(item.humedad_cafe))} labels={history.map((item) => `${Math.round(toNumber(item.tiempo_transcurrido_horas))}h`)} currentValue={`${formatNumber(latestMeasurement?.humedad_cafe)} %`} /></View> : null}
+            <Pressable className="mt-5 flex-row items-center justify-center rounded-button border border-agro-green bg-white px-5 py-4" onPress={() => router.push("/processes/history")}><Ionicons name="options-outline" size={21} color="#2F7D32" /><Text className="ml-2 font-inter-semibold text-agro-green-dark">Administrar proceso</Text></Pressable>
             <Text className="mt-5 text-center font-inter text-xs text-agro-muted">{formatElapsedUpdate(refreshedAt)} · actualización automática cada 10 s</Text>
           </>
         )}

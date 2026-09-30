@@ -15,6 +15,7 @@ from app.schemas.proceso_secado import (
     ProcesoSecadoUpdate,
 )
 from app.services.subscriptions import ensure_process_capacity
+from app.services.process_lifecycle import validate_process_transition
 
 
 router = APIRouter(prefix="/procesos", tags=["Procesos de secado"])
@@ -155,19 +156,22 @@ async def update_process(
     await get_authorized_batch(proceso.id_lote, db, current_user)
     changes = data.model_dump(exclude_unset=True)
     new_state = changes.get("estado")
-    if proceso.estado in FINAL_STATES and new_state not in (None, proceso.estado):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Un proceso finalizado o cancelado no puede reactivarse",
-        )
-    if new_state in FINAL_STATES and "fecha_fin" not in changes:
+    if new_state is not None:
+        validate_process_transition(proceso.estado, new_state)
+
+    target_state = new_state or proceso.estado
+    if (
+        target_state in FINAL_STATES
+        and changes.get("fecha_fin", proceso.fecha_fin) is None
+    ):
         changes["fecha_fin"] = datetime.now(timezone.utc)
-    if new_state in ACTIVE_STATES and changes.get("fecha_fin") is not None:
+
+    final_date = changes.get("fecha_fin", proceso.fecha_fin)
+    if target_state in ACTIVE_STATES and final_date is not None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Un proceso activo no puede tener fecha de finalización",
         )
-    final_date = changes.get("fecha_fin", proceso.fecha_fin)
     if final_date is not None and final_date < proceso.fecha_inicio:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
