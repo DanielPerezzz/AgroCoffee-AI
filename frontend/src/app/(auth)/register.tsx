@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Alert } from "@/components/ui/app-alert";
 import { useAuth } from "@/context/auth-context";
 import { useAppTheme } from "@/context/theme-context";
 

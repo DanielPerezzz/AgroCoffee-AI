@@ -4,7 +4,6 @@ import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Pressable,
   RefreshControl,
@@ -14,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AnimatedProgressBar } from "@/components/ui/animated-progress-bar";
+import { Alert } from "@/components/ui/app-alert";
 import { CoffeeLoader } from "@/components/ui/coffee-loader";
 import { useAuth } from "@/context/auth-context";
 import { useMinimumLoadingTime } from "@/hooks/use-minimum-loading-time";

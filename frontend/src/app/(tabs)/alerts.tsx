@@ -2,9 +2,10 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import type { ComponentProps } from "react";
 import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useMemo, useState } from "react";
-import { Alert as NativeAlert, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Alert } from "@/components/ui/app-alert";
 import { useProcessData } from "@/context/process-data-context";
 import type { DryingAlert } from "@/types/api";
 import { formatDateTime } from "@/utils/format";
@@ -21,7 +22,7 @@ const alertStyles: Record<DryingAlert["nivel"], { icon: IoniconName; color: stri
 function AlertCard({ alert, onAttend }: { alert: DryingAlert; onAttend: () => Promise<void> }) {
   const appearance = alertStyles[alert.nivel];
   const date = formatDateTime(alert.fecha_hora);
-  const showDetails = () => NativeAlert.alert(alert.tipo_alerta.replaceAll("_", " "), alert.mensaje, alert.atendida ? [{ text: "Cerrar" }] : [{ text: "Cancelar", style: "cancel" }, { text: "Marcar atendida", onPress: () => void onAttend() }]);
+  const showDetails = () => Alert.alert(alert.tipo_alerta.replaceAll("_", " "), alert.mensaje, alert.atendida ? [{ text: "Cerrar" }] : [{ text: "Cancelar", style: "cancel" }, { text: "Marcar atendida", onPress: () => void onAttend() }]);
   return (
     <Pressable className="mb-4 rounded-card border border-agro-line bg-agro-surface p-5 shadow-sm active:opacity-80" onPress={showDetails} accessibilityRole="button">
       <View className="flex-row"><View className="h-13 w-13 items-center justify-center rounded-2xl" style={{ width: 52, height: 52, backgroundColor: appearance.background }}><Ionicons name={appearance.icon} size={30} color={appearance.color} /></View><View className="ml-4 flex-1"><View className="flex-row items-center justify-between"><View className="rounded-full px-2.5 py-1" style={{ backgroundColor: appearance.background }}><Text className="font-inter-semibold text-xs" style={{ color: appearance.color }}>{appearance.label}</Text></View><Ionicons name={alert.atendida ? "checkmark-done" : "chevron-forward"} size={21} color={alert.atendida ? "#2F7D32" : "#68736B"} /></View><Text className="mt-3 font-poppins-semibold text-base text-agro-text">{alert.tipo_alerta.replaceAll("_", " ")}</Text><Text className="mt-1 font-inter text-sm leading-5 text-agro-muted">{alert.mensaje}</Text><Text className="mt-4 font-inter text-xs text-agro-muted">{date.time} · {date.date}{alert.atendida ? " · Atendida" : ""}</Text></View></View>

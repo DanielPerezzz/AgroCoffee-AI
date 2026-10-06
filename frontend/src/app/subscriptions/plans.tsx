@@ -4,7 +4,6 @@ import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   Text,
@@ -12,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Alert } from "@/components/ui/app-alert";
 import { useSubscription } from "@/context/subscription-context";
 import type { SubscriptionPlan } from "@/types/api";
 

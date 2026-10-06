@@ -16,6 +16,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
+import { AppAlertProvider } from "@/components/ui/app-alert";
 import { AuthProvider, useAuth } from "@/context/auth-context";
 import { ProcessDataProvider } from "@/context/process-data-context";
 import { SubscriptionProvider } from "@/context/subscription-context";
@@ -38,6 +39,7 @@ function RootNavigator() {
 
         <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="batches/index" />
           <Stack.Screen name="batches/create" />
           <Stack.Screen name="processes/start" />
           <Stack.Screen name="devices/link" />
@@ -79,13 +81,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <SubscriptionProvider>
-          <ProcessDataProvider>
-            <RootNavigator />
-          </ProcessDataProvider>
-        </SubscriptionProvider>
-      </AuthProvider>
+      <AppAlertProvider>
+        <AuthProvider>
+          <SubscriptionProvider>
+            <ProcessDataProvider>
+              <RootNavigator />
+            </ProcessDataProvider>
+          </SubscriptionProvider>
+        </AuthProvider>
+      </AppAlertProvider>
     </ThemeProvider>
   );
 }

@@ -1,9 +1,10 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
 import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Alert } from "@/components/ui/app-alert";
 import { useAuth } from "@/context/auth-context";
 import { useProcessData } from "@/context/process-data-context";
 import { useSubscription } from "@/context/subscription-context";
@@ -210,6 +211,7 @@ export default function SettingsScreen() {
                 ? `Proceso activo #${activeProcess.id_proceso}`
                 : "No hay proceso de secado activo"
             }
+            onPress={() => router.push("/batches")}
           />
           <View className="h-px bg-agro-soft" />
           <Row
