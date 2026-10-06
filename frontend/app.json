@@ -11,7 +11,7 @@
       "icon": "./assets/brand/app-icon.png"
     },
     "android": {
-      "softwareKeyboardLayoutMode": "pan",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#F7F5ED",
         "foregroundImage": "./assets/brand/adaptive-icon.png",

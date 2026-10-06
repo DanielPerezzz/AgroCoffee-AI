@@ -73,7 +73,7 @@ export default function ForgotPasswordScreen() {
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <ScrollView
             contentContainerStyle={{
@@ -83,6 +83,8 @@ export default function ForgotPasswordScreen() {
               paddingVertical: 36,
             }}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            showsVerticalScrollIndicator={false}
           >
             <Pressable
               className="mb-6 h-11 w-11 items-center justify-center rounded-full bg-white"

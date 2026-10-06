@@ -67,7 +67,7 @@ export default function LoginScreen() {
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <ScrollView
             style={{ flex: 1 }}
@@ -78,6 +78,7 @@ export default function LoginScreen() {
               paddingVertical: 40,
             }}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
             showsVerticalScrollIndicator={false}
           >
             {/* Encabezado */}
