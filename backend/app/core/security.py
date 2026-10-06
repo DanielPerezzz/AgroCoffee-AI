@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
-from secrets import token_urlsafe
+import hmac
+from secrets import randbelow, token_urlsafe
 from typing import Any
 
 import jwt
@@ -23,6 +24,30 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def hash_token(token: str) -> str:
     return sha256(token.encode("utf-8")).hexdigest()
+
+
+def generate_password_reset_code() -> str:
+    return f"{randbelow(1_000_000):06d}"
+
+
+def hash_password_reset_code(email: str, code: str) -> str:
+    message = f"{email.strip().lower()}:{code}".encode("utf-8")
+    return hmac.new(
+        settings.secret_key.encode("utf-8"),
+        message,
+        sha256,
+    ).hexdigest()
+
+
+def verify_password_reset_code(
+    email: str,
+    code: str,
+    expected_hash: str,
+) -> bool:
+    return hmac.compare_digest(
+        hash_password_reset_code(email, code),
+        expected_hash,
+    )
 
 
 def _create_token(

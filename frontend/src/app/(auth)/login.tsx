@@ -177,12 +177,7 @@ export default function LoginScreen() {
               <Pressable
                 className="mt-4 self-end"
                 accessibilityRole="button"
-                onPress={() => {
-                  Alert.alert(
-                    "Próximamente",
-                    "La recuperación de contraseña se implementará con el backend."
-                  );
-                }}
+                onPress={() => router.push("/(auth)/forgot-password")}
               >
                 <Text className="font-inter-medium text-sm text-agro-green">
                   ¿Olvidaste tu contraseña?
