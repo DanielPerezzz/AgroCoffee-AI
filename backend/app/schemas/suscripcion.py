@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import Field
+from pydantic import EmailStr, Field
 
 from app.schemas.common import AgroCoffeeSchema
 from app.schemas.enums import EstadoSuscripcion
@@ -40,3 +40,13 @@ class SuscripcionResponse(AgroCoffeeSchema):
     fecha_fin: datetime | None
     progreso_porcentaje: int
     plan: PlanSuscripcionResponse
+
+
+class SuscripcionUsuarioResponse(AgroCoffeeSchema):
+    id_usuario: int
+    nombre: str
+    correo: EmailStr
+
+
+class SuscripcionAdminResponse(SuscripcionResponse):
+    usuario: SuscripcionUsuarioResponse

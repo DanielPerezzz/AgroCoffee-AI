@@ -14,6 +14,29 @@ from app.models.usuario import Usuario
 
 ACTIVE_PROCESS_STATES = {"EN_PROCESO", "PAUSADO"}
 
+SUBSCRIPTION_TRANSITIONS: dict[str, tuple[str, ...]] = {
+    "SOLICITADA": ("EN_REVISION", "RECHAZADA"),
+    "EN_REVISION": ("APROBADA", "RECHAZADA"),
+    "APROBADA": ("INSTALACION_PROGRAMADA", "CANCELADA"),
+    "INSTALACION_PROGRAMADA": ("ACTIVA", "CANCELADA"),
+    "ACTIVA": ("VENCIDA", "CANCELADA"),
+    "VENCIDA": (),
+    "CANCELADA": (),
+    "RECHAZADA": (),
+}
+
+
+def allowed_subscription_transitions(current_state: str) -> tuple[str, ...]:
+    """Return the only states reachable from the current contract state."""
+    return SUBSCRIPTION_TRANSITIONS.get(current_state, ())
+
+
+def subscription_transition_is_allowed(
+    current_state: str,
+    new_state: str,
+) -> bool:
+    return new_state in allowed_subscription_transitions(current_state)
+
 
 def subscription_is_active(
     subscription: Suscripcion | None,

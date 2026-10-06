@@ -17,11 +17,16 @@ from app.models.usuario import Usuario
 from app.schemas.enums import EstadoSuscripcion
 from app.schemas.suscripcion import (
     PlanSuscripcionResponse,
+    SuscripcionAdminResponse,
     SuscripcionCreate,
     SuscripcionEstadoUpdate,
     SuscripcionResponse,
 )
-from app.services.subscriptions import get_latest_subscription
+from app.services.subscriptions import (
+    allowed_subscription_transitions,
+    get_latest_subscription,
+    subscription_transition_is_allowed,
+)
 
 
 plan_router = APIRouter(prefix="/planes", tags=["Planes de suscripción"])
@@ -120,7 +125,7 @@ async def request_subscription(
 
 @router.get(
     "",
-    response_model=list[SuscripcionResponse],
+    response_model=list[SuscripcionAdminResponse],
 )
 async def list_subscriptions(
     db: DatabaseSession,
@@ -156,7 +161,7 @@ async def read_subscription(
 
 @router.patch(
     "/{subscription_id}/estado",
-    response_model=SuscripcionResponse,
+    response_model=SuscripcionAdminResponse,
 )
 async def update_subscription_status(
     subscription_id: int,
@@ -171,6 +176,16 @@ async def update_subscription_status(
     subscription = await get_subscription_or_404(subscription_id, db)
     now = datetime.now(timezone.utc)
     new_state = EstadoSuscripcion(data.estado).value
+    if not subscription_transition_is_allowed(subscription.estado, new_state):
+        allowed = allowed_subscription_transitions(subscription.estado)
+        allowed_text = ", ".join(allowed) if allowed else "ninguno"
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"No se puede cambiar de {subscription.estado} a "
+                f"{new_state}. Estados permitidos: {allowed_text}"
+            ),
+        )
     subscription.estado = new_state
 
     if new_state in {

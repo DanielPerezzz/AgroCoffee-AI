@@ -23,7 +23,7 @@ import { SubscriptionProvider } from "@/context/subscription-context";
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <>
@@ -43,6 +43,10 @@ function RootNavigator() {
           <Stack.Screen name="subscriptions/status" />
           <Stack.Screen name="ai/chat" />
           <Stack.Screen name="explore" />
+
+          <Stack.Protected guard={user?.rol === "ADMINISTRADOR"}>
+            <Stack.Screen name="admin/subscriptions" />
+          </Stack.Protected>
         </Stack.Protected>
       </Stack>
 

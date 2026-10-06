@@ -107,6 +107,15 @@ export default function SubscriptionPlansScreen() {
   const { plans, subscription, isLoading, error, requestPlan } = useSubscription();
   const [requestingId, setRequestingId] = useState<number | null>(null);
 
+  const goBackOrHome = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace("/(tabs)");
+  };
+
   const selectPlan = async (plan: SubscriptionPlan) => {
     if (subscription && activeRequestStates.has(subscription.estado)) {
       router.replace("/subscriptions/status");
@@ -146,7 +155,7 @@ export default function SubscriptionPlansScreen() {
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         <View className="flex-row items-center">
-          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={() => router.back()}>
+          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={goBackOrHome}>
             <Ionicons name="arrow-back" size={23} color="#2F7D32" />
           </Pressable>
           <View className="ml-4 flex-1">

@@ -46,6 +46,15 @@ export default function SubscriptionStatusScreen() {
   const router = useRouter();
   const { subscription, isLoading, error, refreshSubscription } = useSubscription();
 
+  const goBackOrHome = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace("/(tabs)");
+  };
+
   if (!isLoading && !subscription) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED", justifyContent: "center", padding: 24 }}>
@@ -69,7 +78,7 @@ export default function SubscriptionStatusScreen() {
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         <View className="flex-row items-center">
-          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={() => router.back()}>
+          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={goBackOrHome}>
             <Ionicons name="arrow-back" size={23} color="#2F7D32" />
           </Pressable>
           <View className="ml-4 flex-1">
