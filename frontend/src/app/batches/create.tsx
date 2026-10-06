@@ -6,6 +6,8 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, Sc
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useProcessData } from "@/context/process-data-context";
+import { useSubscription } from "@/context/subscription-context";
+import { ServiceAccessNotice } from "@/components/subscriptions/service-access-notice";
 import { normalizeBatchCode } from "@/utils/format";
 
 function Field({ label, value, onChangeText, placeholder, icon, keyboardType = "default" }: { label: string; value: string; onChangeText: (value: string) => void; placeholder: string; icon: React.ComponentProps<typeof Ionicons>["name"]; keyboardType?: "default" | "decimal-pad" }) {
@@ -15,6 +17,7 @@ function Field({ label, value, onChangeText, placeholder, icon, keyboardType = "
 export default function CreateBatchScreen() {
   const router = useRouter();
   const { createBatch } = useProcessData();
+  const { hasServiceAccess } = useSubscription();
   const [code, setCode] = useState(""); const [weight, setWeight] = useState(""); const [humidity, setHumidity] = useState(""); const [saving, setSaving] = useState(false);
   const save = async () => {
     const normalized = normalizeBatchCode(code); const kg = Number(weight.replace(",", ".")); const initial = Number(humidity.replace(",", "."));
@@ -24,7 +27,7 @@ export default function CreateBatchScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}><StatusBar style="dark" /><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}><ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <View className="flex-row items-center"><Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={() => router.back()}><Ionicons name="arrow-back" size={23} color="#2F7D32" /></Pressable><View className="ml-4"><Text className="font-poppins-bold text-2xl text-agro-green-dark">Nuevo lote</Text><Text className="font-inter text-xs text-agro-muted">Datos que serán guardados en PostgreSQL</Text></View></View>
-      <View className="mt-7 rounded-card bg-white p-5 shadow-sm"><Field label="Código del lote *" value={code} onChangeText={setCode} placeholder="Ejemplo: CAFE_2026_01" icon="barcode-outline" /><Field label="Peso en kilogramos *" value={weight} onChangeText={setWeight} placeholder="Ejemplo: 50" icon="scale-outline" keyboardType="decimal-pad" /><Field label="Humedad inicial (%) *" value={humidity} onChangeText={setHumidity} placeholder="Ejemplo: 45" icon="water-outline" keyboardType="decimal-pad" /><Text className="font-inter text-xs leading-5 text-agro-muted">El código se normaliza a mayúsculas y puede contener letras, números, guiones y guion bajo.</Text><Pressable className="mt-6 flex-row items-center justify-center rounded-button bg-agro-green px-6 py-4 disabled:opacity-60" onPress={() => void save()} disabled={saving}>{saving ? <ActivityIndicator color="#FFFFFF" /> : <Ionicons name="save-outline" size={22} color="#FFFFFF" />}<Text className="ml-2 font-inter-semibold text-base text-white">{saving ? "Guardando..." : "Guardar lote"}</Text></Pressable></View>
+      {!hasServiceAccess ? <ServiceAccessNotice className="mt-7" description="La creación de lotes se habilitará cuando el administrador active tu servicio." /> : <View className="mt-7 rounded-card bg-white p-5 shadow-sm"><Field label="Código del lote *" value={code} onChangeText={setCode} placeholder="Ejemplo: CAFE_2026_01" icon="barcode-outline" /><Field label="Peso en kilogramos *" value={weight} onChangeText={setWeight} placeholder="Ejemplo: 50" icon="scale-outline" keyboardType="decimal-pad" /><Field label="Humedad inicial (%) *" value={humidity} onChangeText={setHumidity} placeholder="Ejemplo: 45" icon="water-outline" keyboardType="decimal-pad" /><Text className="font-inter text-xs leading-5 text-agro-muted">El código se normaliza a mayúsculas y puede contener letras, números, guiones y guion bajo.</Text><Pressable className="mt-6 flex-row items-center justify-center rounded-button bg-agro-green px-6 py-4 disabled:opacity-60" onPress={() => void save()} disabled={saving}>{saving ? <ActivityIndicator color="#FFFFFF" /> : <Ionicons name="save-outline" size={22} color="#FFFFFF" />}<Text className="ml-2 font-inter-semibold text-base text-white">{saving ? "Guardando..." : "Guardar lote"}</Text></Pressable></View>}
     </ScrollView></KeyboardAvoidingView></SafeAreaView>
   );
 }

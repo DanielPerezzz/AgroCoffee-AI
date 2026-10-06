@@ -26,7 +26,18 @@ def test_active_subscription_with_future_expiration_grants_access() -> None:
     assert subscription_is_active(current, now)
 
 
-@pytest.mark.parametrize("state", ["SOLICITADA", "EN_REVISION", "VENCIDA"])
+@pytest.mark.parametrize(
+    "state",
+    [
+        "SOLICITADA",
+        "EN_REVISION",
+        "APROBADA",
+        "INSTALACION_PROGRAMADA",
+        "VENCIDA",
+        "CANCELADA",
+        "RECHAZADA",
+    ],
+)
 def test_non_active_states_do_not_grant_access(state: str) -> None:
     assert not subscription_is_active(subscription(state))
 

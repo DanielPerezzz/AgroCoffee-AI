@@ -6,6 +6,7 @@ from app.api.access import ensure_owner_or_admin, is_administrator
 from app.api.dependencies import CurrentUser, DatabaseSession
 from app.models.lote_cafe import LoteCafe
 from app.schemas.lote_cafe import LoteCafeCreate, LoteCafeResponse, LoteCafeUpdate
+from app.services.subscriptions import require_active_subscription
 
 
 router = APIRouter(prefix="/lotes", tags=["Lotes de café"])
@@ -43,6 +44,7 @@ async def create_batch(
     db: DatabaseSession,
     current_user: CurrentUser,
 ) -> LoteCafe:
+    await require_active_subscription(db, current_user)
     lote = LoteCafe(**data.model_dump(), id_usuario=current_user.id_usuario)
     db.add(lote)
     try:

@@ -15,28 +15,30 @@ function Row({
   description,
   onPress,
   danger = false,
+  disabled = false,
 }: {
   icon: React.ComponentProps<typeof Ionicons>["name"];
   title: string;
   description: string;
   onPress?: () => void;
   danger?: boolean;
+  disabled?: boolean;
 }) {
   const content = (
     <View className="flex-row items-center py-4">
       <View
-        className={`h-11 w-11 items-center justify-center rounded-2xl ${danger ? "bg-red-50" : "bg-agro-green-light"}`}
+        className={`h-11 w-11 items-center justify-center rounded-2xl ${danger ? "bg-red-50" : disabled ? "bg-black/5" : "bg-agro-green-light"}`}
       >
         <Ionicons
           name={icon}
           size={23}
-          color={danger ? "#D13A32" : "#2F7D32"}
+          color={danger ? "#D13A32" : disabled ? "#8A938C" : "#2F7D32"}
         />
       </View>
       <View className="ml-3 flex-1">
         <Text
           className="font-inter-semibold text-sm"
-          style={{ color: danger ? "#D13A32" : "#18201A" }}
+          style={{ color: danger ? "#D13A32" : disabled ? "#8A938C" : "#18201A" }}
         >
           {title}
         </Text>
@@ -44,12 +46,14 @@ function Row({
           {description}
         </Text>
       </View>
-      {onPress ? (
+      {disabled ? (
+        <Ionicons name="lock-closed-outline" size={20} color="#8A938C" />
+      ) : onPress ? (
         <Ionicons name="chevron-forward" size={21} color="#8A938C" />
       ) : null}
     </View>
   );
-  return onPress ? (
+  return onPress && !disabled ? (
     <Pressable onPress={onPress} className="active:opacity-60">
       {content}
     </Pressable>
@@ -62,7 +66,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { activeProcess, batches, devices } = useProcessData();
-  const { subscription } = useSubscription();
+  const { hasServiceAccess, subscription } = useSubscription();
   const confirmLogout = () =>
     Alert.alert("Cerrar sesión", "¿Deseas cerrar la sesión actual?", [
       { text: "Cancelar", style: "cancel" },
@@ -156,13 +160,16 @@ export default function SettingsScreen() {
           <View className="h-px bg-black/5" />
           <Row
             icon="hardware-chip-outline"
-            title={`${devices.length} dispositivos`}
+            title={hasServiceAccess ? `${devices.length} dispositivos` : "Dispositivos bloqueados"}
             description={
-              devices[0]
+              !hasServiceAccess
+                ? "Disponible cuando la suscripción esté activa"
+                : devices[0]
                 ? `${devices[0].nombre} · ${devices[0].estado}`
                 : "Ningún ESP32 asociado"
             }
             onPress={() => router.push("/devices/link")}
+            disabled={!hasServiceAccess}
           />
           <View className="h-px bg-black/5" />
           <Row
@@ -172,21 +179,23 @@ export default function SettingsScreen() {
           />
         </View>
         <Pressable
-          className="mt-6 flex-row items-center justify-center rounded-button border border-agro-green bg-white px-5 py-4"
+          className={`mt-6 flex-row items-center justify-center rounded-button border px-5 py-4 ${hasServiceAccess ? "border-agro-green bg-white" : "border-black/5 bg-black/5"}`}
           onPress={() => router.push("/batches/create")}
+          disabled={!hasServiceAccess}
         >
-          <Ionicons name="add-circle-outline" size={23} color="#2F7D32" />
-          <Text className="ml-2 font-inter-semibold text-sm text-agro-green-dark">
-            Crear nuevo lote
+          <Ionicons name={hasServiceAccess ? "add-circle-outline" : "lock-closed-outline"} size={23} color={hasServiceAccess ? "#2F7D32" : "#8A938C"} />
+          <Text className={`ml-2 font-inter-semibold text-sm ${hasServiceAccess ? "text-agro-green-dark" : "text-agro-muted"}`}>
+            {hasServiceAccess ? "Crear nuevo lote" : "Creación de lotes bloqueada"}
           </Text>
         </Pressable>
         <Pressable
-          className="mt-3 flex-row items-center justify-center rounded-button bg-agro-green px-5 py-4"
+          className={`mt-3 flex-row items-center justify-center rounded-button px-5 py-4 ${hasServiceAccess ? "bg-agro-green" : "bg-black/10"}`}
           onPress={() => router.push("/processes/start")}
+          disabled={!hasServiceAccess}
         >
-          <Ionicons name="play-outline" size={23} color="#FFFFFF" />
-          <Text className="ml-2 font-inter-semibold text-sm text-white">
-            Iniciar proceso de secado
+          <Ionicons name={hasServiceAccess ? "play-outline" : "lock-closed-outline"} size={23} color={hasServiceAccess ? "#FFFFFF" : "#68736B"} />
+          <Text className={`ml-2 font-inter-semibold text-sm ${hasServiceAccess ? "text-white" : "text-agro-muted"}`}>
+            {hasServiceAccess ? "Iniciar proceso de secado" : "Proceso de secado bloqueado"}
           </Text>
         </Pressable>
         <View className="mt-6 rounded-card bg-white px-4 shadow-sm">

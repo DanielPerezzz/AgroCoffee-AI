@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useProcessData } from "@/context/process-data-context";
 import { useSubscription } from "@/context/subscription-context";
+import { ServiceAccessNotice } from "@/components/subscriptions/service-access-notice";
 
 type InputFieldProps = {
   label: string;
@@ -205,21 +206,10 @@ export default function LinkDeviceScreen() {
             </Text>
           </View>
 
-          {!hasServiceAccess ? (
-            <Pressable
-              className="mb-5 flex-row items-center rounded-card bg-agro-green-light p-4"
-              onPress={() => router.push(subscription ? "/subscriptions/status" : "/subscriptions/plans")}
-            >
-              <Ionicons name="lock-closed-outline" size={23} color="#2F7D32" />
-              <Text className="ml-3 flex-1 font-inter-semibold text-sm text-agro-green-dark">
-                Activa una suscripción para registrar el ESP32.
-              </Text>
-              <Ionicons name="chevron-forward" size={20} color="#2F7D32" />
-            </Pressable>
-          ) : null}
-
           {/* Formulario o resultado del registro */}
-          {generatedApiKey ? (
+          {!hasServiceAccess ? (
+            <ServiceAccessNotice description="La vinculación del ESP32 se habilitará cuando el administrador active tu servicio." />
+          ) : generatedApiKey ? (
             <View className="rounded-card bg-white p-6 shadow-sm">
               <View className="h-14 w-14 items-center justify-center self-center rounded-full bg-agro-green-light">
                 <Ionicons name="checkmark-circle" size={34} color="#2F7D32" />

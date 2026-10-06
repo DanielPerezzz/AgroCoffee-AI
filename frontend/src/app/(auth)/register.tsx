@@ -23,11 +23,22 @@ export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password) {
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
       Alert.alert("Campos incompletos", "Completa todos los campos.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert(
+        "Las contraseñas no coinciden",
+        "Verifica la contraseña y su confirmación.",
+      );
       return;
     }
 
@@ -115,15 +126,70 @@ export default function RegisterScreen() {
               <Text className="mt-5 font-poppins-semibold text-sm text-agro-text">
                 Contraseña
               </Text>
-              <TextInput
-                className="mt-2 rounded-button border border-black/10 bg-agro-cream px-4 py-4 font-inter text-base text-agro-text"
-                placeholder="Mínimo 8 caracteres"
-                placeholderTextColor="#8A938C"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
+              <View className="mt-2 flex-row items-center rounded-button border border-black/10 bg-agro-cream px-4">
+                <Ionicons name="lock-closed-outline" size={22} color="#68736B" />
+                <TextInput
+                  className="ml-3 flex-1 py-4 font-inter text-base text-agro-text"
+                  placeholder="Mínimo 8 caracteres"
+                  placeholderTextColor="#8A938C"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="new-password"
+                />
+                <Pressable
+                  onPress={() => setShowPassword((current) => !current)}
+                  hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={23}
+                    color="#68736B"
+                  />
+                </Pressable>
+              </View>
+
+              <Text className="mt-5 font-poppins-semibold text-sm text-agro-text">
+                Confirmar contraseña
+              </Text>
+              <View className="mt-2 flex-row items-center rounded-button border border-black/10 bg-agro-cream px-4">
+                <Ionicons name="shield-checkmark-outline" size={22} color="#68736B" />
+                <TextInput
+                  className="ml-3 flex-1 py-4 font-inter text-base text-agro-text"
+                  placeholder="Escribe nuevamente la contraseña"
+                  placeholderTextColor="#8A938C"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirmPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="new-password"
+                />
+                <Pressable
+                  onPress={() =>
+                    setShowConfirmPassword((current) => !current)
+                  }
+                  hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    showConfirmPassword
+                      ? "Ocultar confirmación de contraseña"
+                      : "Mostrar confirmación de contraseña"
+                  }
+                >
+                  <Ionicons
+                    name={
+                      showConfirmPassword ? "eye-off-outline" : "eye-outline"
+                    }
+                    size={23}
+                    color="#68736B"
+                  />
+                </Pressable>
+              </View>
 
               <Text className="mt-2 font-inter text-xs leading-4 text-agro-muted">
                 Debe incluir mayúscula, minúscula y número.
