@@ -1,5 +1,9 @@
 import { useEffect, useRef } from "react";
-import { Animated, Text, View } from "react-native";
+import { Animated, Image, Text, View } from "react-native";
+
+const brandLogo = require("../../../assets/brand/agrocoffee-logo.png");
+const LOGO_WIDTH = 72;
+const LOGO_HEIGHT = 90;
 
 type CoffeeLoaderProps = {
   label?: string;
@@ -8,51 +12,72 @@ type CoffeeLoaderProps = {
 export function CoffeeLoader({
   label = "Preparando AgroCoffee AI...",
 }: CoffeeLoaderProps) {
-  const animation = useRef(new Animated.Value(0)).current;
+  const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(animation, {
+        Animated.timing(progress, {
           toValue: 1,
-          duration: 650,
-          useNativeDriver: true,
+          duration: 1150,
+          useNativeDriver: false,
         }),
-        Animated.timing(animation, {
+        Animated.delay(180),
+        Animated.timing(progress, {
           toValue: 0,
-          duration: 650,
-          useNativeDriver: true,
+          duration: 0,
+          useNativeDriver: false,
         }),
       ]),
     );
     loop.start();
     return () => loop.stop();
-  }, [animation]);
+  }, [progress]);
+
+  const fillHeight = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, LOGO_HEIGHT],
+  });
 
   return (
-    <View className="items-center justify-center px-6">
-      <Animated.View
-        accessibilityRole="progressbar"
-        accessibilityLabel={label}
-        className="h-14 w-10 items-center justify-center rounded-full bg-agro-coffee"
-        style={{
-          opacity: animation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.55, 1],
-          }),
-          transform: [
-            { rotate: "-24deg" },
-            {
-              scale: animation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.88, 1.08],
-              }),
-            },
-          ],
-        }}
+    <View
+      className="items-center justify-center px-6"
+      accessibilityRole="progressbar"
+      accessibilityLabel={label}
+    >
+      <View
+        style={{ width: LOGO_WIDTH, height: LOGO_HEIGHT }}
+        className="relative"
       >
-        <View className="h-9 w-1 rounded-full bg-agro-cream/80" />
-      </Animated.View>
+        <Image
+          source={brandLogo}
+          resizeMode="contain"
+          style={{
+            width: LOGO_WIDTH,
+            height: LOGO_HEIGHT,
+            tintColor: "#D9C8BC",
+          }}
+        />
+
+        <Animated.View
+          className="absolute bottom-0 left-0 overflow-hidden"
+          style={{ width: LOGO_WIDTH, height: fillHeight }}
+        >
+          <Image
+            source={brandLogo}
+            resizeMode="contain"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: LOGO_WIDTH,
+              height: LOGO_HEIGHT,
+              tintColor: "#6B3518",
+            }}
+          />
+        </Animated.View>
+      </View>
+
       <Text className="mt-4 text-center font-inter-medium text-sm text-agro-muted">
         {label}
       </Text>

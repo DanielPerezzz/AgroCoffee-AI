@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AnimatedProgressBar } from "@/components/ui/animated-progress-bar";
 import { CoffeeLoader } from "@/components/ui/coffee-loader";
 import { useAuth } from "@/context/auth-context";
+import { useMinimumLoadingTime } from "@/hooks/use-minimum-loading-time";
 import { withJsonHeaders } from "@/services/api";
 import type { AdminSubscription, SubscriptionStatus } from "@/types/api";
 
@@ -81,6 +82,7 @@ export default function AdminSubscriptionsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
+  const showInitialLoader = useMinimumLoadingTime(isLoading);
 
   const loadSubscriptions = useCallback(
     async (silent = false) => {
@@ -185,7 +187,7 @@ export default function AdminSubscriptionsScreen() {
     );
   };
 
-  if (isLoading) {
+  if (showInitialLoader) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-agro-cream">
         <CoffeeLoader label="Cargando solicitudes..." />

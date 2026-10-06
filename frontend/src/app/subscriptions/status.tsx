@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AnimatedProgressBar } from "@/components/ui/animated-progress-bar";
 import { CoffeeLoader } from "@/components/ui/coffee-loader";
 import { useSubscription } from "@/context/subscription-context";
+import { useMinimumLoadingTime } from "@/hooks/use-minimum-loading-time";
 import type { SubscriptionStatus } from "@/types/api";
 
 const steps = [
@@ -47,6 +48,7 @@ function date(value: string | null): string {
 export default function SubscriptionStatusScreen() {
   const router = useRouter();
   const { subscription, isLoading, error, refreshSubscription } = useSubscription();
+  const showInitialLoader = useMinimumLoadingTime(isLoading);
 
   const goBackOrHome = () => {
     if (router.canGoBack()) {
@@ -57,7 +59,7 @@ export default function SubscriptionStatusScreen() {
     router.replace("/(tabs)");
   };
 
-  if (isLoading) {
+  if (showInitialLoader) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-agro-cream">
         <CoffeeLoader label="Consultando tu suscripción..." />
