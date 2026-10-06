@@ -1,11 +1,12 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import type { ComponentProps } from "react";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useProcessData } from "@/context/process-data-context";
+import { useAppTheme } from "@/context/theme-context";
 import { getDryingAppearance } from "@/utils/drying-status";
 import { formatNumber, toNumber } from "@/utils/format";
 
@@ -24,7 +25,7 @@ function Variable({
 }) {
   return (
     <View className="mb-4 flex-row items-center" style={{ width: "48%" }}>
-      <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+      <View className="h-10 w-10 items-center justify-center rounded-xl bg-agro-surface">
         <Ionicons name={icon} size={22} color={color} />
       </View>
       <View className="ml-3 flex-1">
@@ -41,6 +42,7 @@ function Variable({
 
 export default function AIScreen() {
   const router = useRouter();
+  const { isDark } = useAppTheme();
   const {
     latestMeasurement: measurement,
     latestPrediction: prediction,
@@ -54,8 +56,8 @@ export default function AIScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}>
-      <StatusBar style="dark" />
+    <SafeAreaView className="flex-1 bg-agro-cream">
+      <ThemedStatusBar />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -80,7 +82,7 @@ export default function AIScreen() {
         </Text>
 
         {!prediction || !measurement ? (
-          <View className="mt-6 items-center rounded-card bg-white p-8">
+          <View className="mt-6 items-center rounded-card bg-agro-surface p-8">
             <Ionicons
               name="hardware-chip-outline"
               size={46}
@@ -95,7 +97,7 @@ export default function AIScreen() {
           </View>
         ) : (
           <>
-            <View className="mt-6 rounded-card bg-white p-5 shadow-sm">
+            <View className="mt-6 rounded-card bg-agro-surface p-5 shadow-sm">
               <View className="mb-5 flex-row items-center">
                 <View className="h-12 w-12 items-center justify-center rounded-2xl bg-black">
                   <Ionicons
@@ -116,7 +118,11 @@ export default function AIScreen() {
 
               <View
                 className="flex-row items-center rounded-card p-4"
-                style={{ backgroundColor: appearance.softColor }}
+                style={{
+                  backgroundColor: isDark
+                    ? appearance.darkSoftColor
+                    : appearance.softColor,
+                }}
               >
                 <View
                   className="h-16 w-16 items-center justify-center rounded-full"
@@ -150,7 +156,7 @@ export default function AIScreen() {
                     {formatNumber(confidence)} %
                   </Text>
                 </View>
-                <View className="mt-3 h-3 overflow-hidden rounded-full bg-black/5">
+                <View className="mt-3 h-3 overflow-hidden rounded-full bg-agro-soft">
                   <View
                     className="h-full rounded-full bg-agro-green"
                     style={{ width: `${confidence}%` }}
@@ -159,7 +165,7 @@ export default function AIScreen() {
               </View>
             </View>
 
-            <View className="mt-5 flex-row items-center rounded-card bg-white p-5 shadow-sm">
+            <View className="mt-5 flex-row items-center rounded-card bg-agro-surface p-5 shadow-sm">
               <View className="h-14 w-14 items-center justify-center rounded-2xl bg-agro-green-light">
                 <Ionicons name="time-outline" size={31} color="#2F7D32" />
               </View>
@@ -175,7 +181,7 @@ export default function AIScreen() {
               </View>
             </View>
 
-            <View className="mt-5 rounded-card bg-blue-50 p-5">
+            <View className="mt-5 rounded-card border border-agro-line bg-agro-soft p-5">
               <Text className="mb-5 font-poppins-semibold text-base text-agro-text">
                 Variables analizadas
               </Text>

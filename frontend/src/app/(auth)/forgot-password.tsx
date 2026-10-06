@@ -1,7 +1,7 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { publicRequest, withJsonHeaders } from "@/services/api";
+import { useAppTheme } from "@/context/theme-context";
 
 type PasswordResetStartResponse = {
   message: string;
@@ -26,6 +27,7 @@ type PasswordResetStartResponse = {
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const { isDark } = useAppTheme();
   const [email, setEmail] = useState("");
   const [demoCode, setDemoCode] = useState<string | null>(null);
   const [requested, setRequested] = useState(false);
@@ -68,8 +70,15 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <LinearGradient colors={["#EAF4E7", "#F7F5ED", "#FFFFFF"]} style={{ flex: 1 }}>
-      <StatusBar style="dark" />
+    <LinearGradient
+      colors={
+        isDark
+          ? (["#142019", "#0E1511", "#18211B"] as const)
+          : (["#EAF4E7", "#F7F5ED", "#FFFFFF"] as const)
+      }
+      style={{ flex: 1 }}
+    >
+      <ThemedStatusBar />
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -87,7 +96,7 @@ export default function ForgotPasswordScreen() {
             showsVerticalScrollIndicator={false}
           >
             <Pressable
-              className="mb-6 h-11 w-11 items-center justify-center rounded-full bg-white"
+              className="mb-6 h-11 w-11 items-center justify-center rounded-full bg-agro-surface"
               onPress={() => router.back()}
             >
               <Ionicons name="arrow-back" size={23} color="#2F7D32" />
@@ -103,13 +112,13 @@ export default function ForgotPasswordScreen() {
               Solicita un código temporal para establecer una contraseña nueva.
             </Text>
 
-            <View className="mt-7 rounded-card bg-white p-6 shadow-lg">
+            <View className="mt-7 rounded-card bg-agro-surface p-6 shadow-lg">
               {!requested ? (
                 <>
                   <Text className="font-poppins-semibold text-sm text-agro-text">
                     Correo electrónico
                   </Text>
-                  <View className="mt-2 flex-row items-center rounded-button border border-black/10 bg-agro-cream px-4">
+                  <View className="mt-2 flex-row items-center rounded-button border border-agro-line bg-agro-cream px-4">
                     <Ionicons name="mail-outline" size={22} color="#68736B" />
                     <TextInput
                       className="ml-3 flex-1 py-4 font-inter text-base text-agro-text"

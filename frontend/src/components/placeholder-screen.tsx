@@ -17,14 +17,9 @@ export function PlaceholderScreen({
   icon,
 }: PlaceholderScreenProps) {
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: "#F7F5ED",
-      }}
-    >
+    <SafeAreaView className="flex-1 bg-agro-cream">
       <View className="flex-1 items-center justify-center px-6 pb-24">
-        <View className="w-full items-center rounded-card bg-white p-8 shadow-lg">
+        <View className="w-full items-center rounded-card bg-agro-surface p-8 shadow-lg">
           <View className="h-20 w-20 items-center justify-center rounded-full bg-agro-green-light">
             <Ionicons name={icon} size={42} color="#2F7D32" />
           </View>

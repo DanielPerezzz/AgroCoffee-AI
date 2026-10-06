@@ -9,6 +9,8 @@ import Svg, {
   Text as SvgText,
 } from "react-native-svg";
 
+import { useAppTheme } from "@/context/theme-context";
+
 type HumidityChartProps = {
   values: number[];
   labels: string[];
@@ -25,6 +27,7 @@ export function HumidityChart({
   labels,
   currentValue,
 }: HumidityChartProps) {
+  const { isDark } = useAppTheme();
   const data = values.length > 0 ? values : [0];
   const minimum = Math.max(0, Math.floor(Math.min(...data) - 2));
   const maximum = Math.max(minimum + 5, Math.ceil(Math.max(...data) + 2));
@@ -49,7 +52,7 @@ export function HumidityChart({
   );
 
   return (
-    <View className="rounded-card border border-black/5 bg-white p-5 shadow-sm">
+    <View className="rounded-card border border-agro-line bg-agro-surface p-5 shadow-sm">
       <View className="mb-2 flex-row items-start justify-between">
         <View className="flex-1">
           <Text className="font-poppins-semibold text-base text-agro-text">
@@ -84,7 +87,7 @@ export function HumidityChart({
               y1={y}
               x2={RIGHT}
               y2={y}
-              stroke="#DFE5DF"
+              stroke={isDark ? "#36453A" : "#DFE5DF"}
               strokeWidth="1"
               strokeDasharray="4 4"
             />
@@ -98,7 +101,7 @@ export function HumidityChart({
               key={`label-${index}`}
               x="20"
               y={y + 4}
-              fill="#7A847C"
+              fill={isDark ? "#A9B5AB" : "#7A847C"}
               fontSize="10"
               fontFamily="Inter_400Regular"
               textAnchor="middle"
@@ -124,7 +127,7 @@ export function HumidityChart({
             cx={point.x}
             cy={point.y}
             r={index === points.length - 1 ? 5 : 3.5}
-            fill="#FFFFFF"
+            fill={isDark ? "#18211B" : "#FFFFFF"}
             stroke="#2F7D32"
             strokeWidth={index === points.length - 1 ? 3 : 2}
           />
@@ -135,7 +138,7 @@ export function HumidityChart({
             key={`${label}-${index}`}
             x={points[index]?.x ?? LEFT}
             y="162"
-            fill="#68736B"
+            fill={isDark ? "#A9B5AB" : "#68736B"}
             fontSize="9"
             fontFamily="Inter_400Regular"
             textAnchor="middle"

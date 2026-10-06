@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -197,7 +197,7 @@ export default function AdminSubscriptionsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-agro-cream">
-      <StatusBar style="dark" />
+      <ThemedStatusBar />
       <FlatList
         data={visibleSubscriptions}
         keyExtractor={(item) => String(item.id_suscripcion)}
@@ -213,7 +213,7 @@ export default function AdminSubscriptionsScreen() {
           <>
             <View className="mb-5 mt-3 flex-row items-center">
               <Pressable
-                className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm"
+                className="h-11 w-11 items-center justify-center rounded-full bg-agro-surface shadow-sm"
                 onPress={() => router.back()}
               >
                 <Ionicons name="arrow-back" size={23} color="#2F7D32" />
@@ -234,7 +234,7 @@ export default function AdminSubscriptionsScreen() {
                   className={`mb-2 mr-2 rounded-full border px-4 py-2 ${
                     filter === item.value
                       ? "border-agro-green bg-agro-green"
-                      : "border-black/10 bg-white"
+                      : "border-agro-line bg-agro-surface"
                   }`}
                   onPress={() => setFilter(item.value)}
                 >
@@ -251,7 +251,7 @@ export default function AdminSubscriptionsScreen() {
           </>
         }
         ListEmptyComponent={
-          <View className="items-center rounded-card bg-white p-8 shadow-sm">
+          <View className="items-center rounded-card bg-agro-surface p-8 shadow-sm">
             <Ionicons
               name="checkmark-done-circle-outline"
               size={44}
@@ -270,7 +270,7 @@ export default function AdminSubscriptionsScreen() {
           const next = NEXT_ACTIONS[item.estado];
           const busy = busyId === item.id_suscripcion;
           return (
-            <View className="mb-4 rounded-card bg-white p-5 shadow-sm">
+            <View className="mb-4 rounded-card bg-agro-surface p-5 shadow-sm">
               <View className="flex-row items-start justify-between">
                 <View className="mr-3 flex-1">
                   <Text className="font-poppins-semibold text-base text-agro-text">
@@ -293,7 +293,7 @@ export default function AdminSubscriptionsScreen() {
                 </View>
               </View>
 
-              <View className="my-4 h-px bg-black/5" />
+              <View className="my-4 h-px bg-agro-soft" />
               <View className="flex-row justify-between">
                 <View>
                   <Text className="font-inter text-xs text-agro-muted">

@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -40,7 +40,7 @@ function PlanCard({
 }) {
   return (
     <View
-      className="mb-5 overflow-hidden rounded-card bg-white shadow-sm"
+      className="mb-5 overflow-hidden rounded-card bg-agro-surface shadow-sm"
       style={{ borderWidth: highlighted ? 2 : 1, borderColor: highlighted ? "#2F7D32" : "#E5E8E5" }}
     >
       {highlighted ? (
@@ -68,7 +68,7 @@ function PlanCard({
           </View>
         </View>
 
-        <View className="my-5 h-px bg-black/5" />
+        <View className="my-5 h-px bg-agro-soft" />
         {plan.caracteristicas.map((feature) => (
           <View key={feature} className="mb-3 flex-row items-start">
             <Ionicons name="checkmark-circle" size={20} color="#2F7D32" />
@@ -151,11 +151,11 @@ export default function SubscriptionPlansScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}>
-      <StatusBar style="dark" />
+    <SafeAreaView className="flex-1 bg-agro-cream">
+      <ThemedStatusBar />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         <View className="flex-row items-center">
-          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={goBackOrHome}>
+          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-agro-surface shadow-sm" onPress={goBackOrHome}>
             <Ionicons name="arrow-back" size={23} color="#2F7D32" />
           </Pressable>
           <View className="ml-4 flex-1">

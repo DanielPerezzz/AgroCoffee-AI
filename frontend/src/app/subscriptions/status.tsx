@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -69,8 +69,8 @@ export default function SubscriptionStatusScreen() {
 
   if (!isLoading && !subscription) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED", justifyContent: "center", padding: 24 }}>
-        <View className="items-center rounded-card bg-white p-7 shadow-sm">
+      <SafeAreaView className="flex-1 justify-center bg-agro-cream p-6">
+        <View className="items-center rounded-card bg-agro-surface p-7 shadow-sm">
           <Ionicons name="card-outline" size={54} color="#2F7D32" />
           <Text className="mt-5 text-center font-poppins-semibold text-xl text-agro-text">Aún no tienes un plan</Text>
           <Text className="mt-2 text-center font-inter text-sm leading-5 text-agro-muted">Selecciona una suscripción para iniciar el proceso de contratación.</Text>
@@ -86,18 +86,18 @@ export default function SubscriptionStatusScreen() {
   const terminalProblem = subscription && ["VENCIDA", "CANCELADA", "RECHAZADA"].includes(subscription.estado);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}>
-      <StatusBar style="dark" />
+    <SafeAreaView className="flex-1 bg-agro-cream">
+      <ThemedStatusBar />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         <View className="flex-row items-center">
-          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm" onPress={goBackOrHome}>
+          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-agro-surface shadow-sm" onPress={goBackOrHome}>
             <Ionicons name="arrow-back" size={23} color="#2F7D32" />
           </Pressable>
           <View className="ml-4 flex-1">
             <Text className="font-poppins-bold text-2xl text-agro-green-dark">Mi suscripción</Text>
             <Text className="font-inter text-xs text-agro-muted">Seguimiento del contrato y servicio</Text>
           </View>
-          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-white" onPress={() => void refreshSubscription()}>
+          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-agro-surface" onPress={() => void refreshSubscription()}>
             <Ionicons name="refresh" size={21} color="#2F7D32" />
           </Pressable>
         </View>
@@ -125,7 +125,7 @@ export default function SubscriptionStatusScreen() {
               </View>
             </View>
 
-            <View className="mt-6 rounded-card bg-white p-5 shadow-sm">
+            <View className="mt-6 rounded-card bg-agro-surface p-5 shadow-sm">
               <Text className="font-poppins-semibold text-lg text-agro-text">Proceso de contratación</Text>
               <View className="mt-5">
                 {steps.map((item, index) => {
@@ -149,7 +149,7 @@ export default function SubscriptionStatusScreen() {
               </View>
             </View>
 
-            <View className="mt-5 rounded-card bg-white p-5 shadow-sm">
+            <View className="mt-5 rounded-card bg-agro-surface p-5 shadow-sm">
               <Text className="font-poppins-semibold text-base text-agro-text">Detalle del servicio</Text>
               <View className="mt-4 flex-row justify-between"><Text className="font-inter text-sm text-agro-muted">Contrato</Text><Text className="font-inter-semibold text-sm text-agro-text">{subscription.codigo_contrato ?? "Pendiente"}</Text></View>
               <View className="mt-3 flex-row justify-between"><Text className="font-inter text-sm text-agro-muted">Solicitud</Text><Text className="font-inter-semibold text-sm text-agro-text">{date(subscription.fecha_solicitud)}</Text></View>

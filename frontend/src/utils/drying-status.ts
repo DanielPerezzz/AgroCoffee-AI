@@ -10,6 +10,7 @@ export type DryingAppearance = {
   description: string;
   color: string;
   softColor: string;
+  darkSoftColor: string;
   textColor: string;
   icon: IoniconName;
 };
@@ -20,6 +21,7 @@ const appearances: Record<DryingStatus, DryingAppearance> = {
     description: "El proceso se encuentra bajo condiciones adecuadas.",
     color: "#2F7D32",
     softColor: "#EAF4E7",
+    darkSoftColor: "#1D3722",
     textColor: "#FFFFFF",
     icon: "checkmark-circle",
   },
@@ -28,6 +30,7 @@ const appearances: Record<DryingStatus, DryingAppearance> = {
     description: "Las condiciones actuales pueden ralentizar el secado.",
     color: "#E99A00",
     softColor: "#FFF3D2",
+    darkSoftColor: "#3A2D12",
     textColor: "#FFFFFF",
     icon: "time",
   },
@@ -36,6 +39,7 @@ const appearances: Record<DryingStatus, DryingAppearance> = {
     description: "Se detectaron condiciones que requieren atención.",
     color: "#D13A32",
     softColor: "#FDE7E5",
+    darkSoftColor: "#3B201E",
     textColor: "#FFFFFF",
     icon: "alert-circle",
   },
@@ -44,6 +48,7 @@ const appearances: Record<DryingStatus, DryingAppearance> = {
     description: "La humedad objetivo del café fue alcanzada.",
     color: "#2878C7",
     softColor: "#EAF4FF",
+    darkSoftColor: "#172E43",
     textColor: "#FFFFFF",
     icon: "flag",
   },

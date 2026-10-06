@@ -2,8 +2,11 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useAppTheme } from "@/context/theme-context";
+
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const { isDark } = useAppTheme();
 
   return (
     <Tabs
@@ -11,7 +14,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: "#F5B700",
-        tabBarInactiveTintColor: "#FFFFFF",
+        tabBarInactiveTintColor: isDark ? "#A9B7AC" : "#FFFFFF",
         tabBarLabelStyle: {
           fontFamily: "Inter_500Medium",
           fontSize: 11,
@@ -20,7 +23,7 @@ export default function TabsLayout() {
           height: 64 + insets.bottom,
           paddingTop: 8,
           paddingBottom: Math.max(insets.bottom, 8),
-          backgroundColor: "#101512",
+          backgroundColor: isDark ? "#080D0A" : "#101512",
           borderTopWidth: 0,
           elevation: 12,
           shadowColor: "#000000",

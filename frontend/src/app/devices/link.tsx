@@ -1,6 +1,6 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -44,7 +44,7 @@ function InputField({
         {label}
       </Text>
 
-      <View className="mt-2 flex-row items-center rounded-button border border-black/10 bg-agro-cream px-4">
+      <View className="mt-2 flex-row items-center rounded-button border border-agro-line bg-agro-cream px-4">
         <Ionicons name={icon} size={22} color="#68736B" />
 
         <TextInput
@@ -136,13 +136,8 @@ export default function LinkDeviceScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: "#F7F5ED",
-      }}
-    >
-      <StatusBar style="dark" />
+    <SafeAreaView className="flex-1 bg-agro-cream">
+      <ThemedStatusBar />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -162,7 +157,7 @@ export default function LinkDeviceScreen() {
           {/* Encabezado */}
           <View className="flex-row items-center">
             <Pressable
-              className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm active:opacity-60"
+              className="h-11 w-11 items-center justify-center rounded-full bg-agro-surface shadow-sm active:opacity-60"
               onPress={() => router.back()}
               accessibilityRole="button"
               accessibilityLabel="Regresar"
@@ -210,7 +205,7 @@ export default function LinkDeviceScreen() {
           {!hasServiceAccess ? (
             <ServiceAccessNotice description="La vinculación del ESP32 se habilitará cuando el administrador active tu servicio." />
           ) : generatedApiKey ? (
-            <View className="rounded-card bg-white p-6 shadow-sm">
+            <View className="rounded-card bg-agro-surface p-6 shadow-sm">
               <View className="h-14 w-14 items-center justify-center self-center rounded-full bg-agro-green-light">
                 <Ionicons name="checkmark-circle" size={34} color="#2F7D32" />
               </View>
@@ -234,7 +229,7 @@ export default function LinkDeviceScreen() {
               </Pressable>
             </View>
           ) : (
-          <View className="rounded-card bg-white p-6 shadow-sm">
+          <View className="rounded-card bg-agro-surface p-6 shadow-sm">
             <InputField
               label="Nombre del dispositivo"
               placeholder="Ejemplo: Secador principal"

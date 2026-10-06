@@ -1,12 +1,13 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/auth-context";
 import { useProcessData } from "@/context/process-data-context";
 import { useSubscription } from "@/context/subscription-context";
+import { useAppTheme, type ThemeMode } from "@/context/theme-context";
 import { API_BASE_URL } from "@/services/api";
 
 function Row({
@@ -27,7 +28,7 @@ function Row({
   const content = (
     <View className="flex-row items-center py-4">
       <View
-        className={`h-11 w-11 items-center justify-center rounded-2xl ${danger ? "bg-red-50" : disabled ? "bg-black/5" : "bg-agro-green-light"}`}
+        className={`h-11 w-11 items-center justify-center rounded-2xl ${danger ? "bg-red-50" : disabled ? "bg-agro-soft" : "bg-agro-green-light"}`}
       >
         <Ionicons
           name={icon}
@@ -37,8 +38,13 @@ function Row({
       </View>
       <View className="ml-3 flex-1">
         <Text
-          className="font-inter-semibold text-sm"
-          style={{ color: danger ? "#D13A32" : disabled ? "#8A938C" : "#18201A" }}
+          className={`font-inter-semibold text-sm ${
+            danger
+              ? "text-agro-red"
+              : disabled
+                ? "text-agro-muted"
+                : "text-agro-text"
+          }`}
         >
           {title}
         </Text>
@@ -67,6 +73,7 @@ export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const { activeProcess, batches, devices } = useProcessData();
   const { hasServiceAccess, subscription } = useSubscription();
+  const { mode, setMode } = useAppTheme();
   const confirmLogout = () =>
     Alert.alert("Cerrar sesión", "¿Deseas cerrar la sesión actual?", [
       { text: "Cancelar", style: "cancel" },
@@ -77,8 +84,8 @@ export default function SettingsScreen() {
       },
     ]);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}>
-      <StatusBar style="dark" />
+    <SafeAreaView className="flex-1 bg-agro-cream">
+      <ThemedStatusBar />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -110,12 +117,59 @@ export default function SettingsScreen() {
             </Text>
           </View>
         </View>
+        <Text className="mb-1 mt-7 font-poppins-semibold text-base text-agro-text">
+          Apariencia
+        </Text>
+        <View className="rounded-card bg-agro-surface p-4 shadow-sm">
+          <Text className="font-inter text-xs leading-4 text-agro-muted">
+            Elige cómo quieres visualizar AgroCoffee AI. La selección se
+            conservará en este dispositivo.
+          </Text>
+          <View className="mt-4 flex-row rounded-2xl bg-agro-soft p-1.5">
+            {(
+              [
+                { value: "light", label: "Claro", icon: "sunny-outline" },
+                { value: "dark", label: "Oscuro", icon: "moon-outline" },
+              ] as Array<{
+                value: ThemeMode;
+                label: string;
+                icon: React.ComponentProps<typeof Ionicons>["name"];
+              }>
+            ).map((option) => {
+              const selected = mode === option.value;
+              return (
+                <Pressable
+                  key={option.value}
+                  className={`flex-1 flex-row items-center justify-center rounded-xl px-3 py-3 ${
+                    selected ? "bg-agro-green" : "bg-transparent"
+                  }`}
+                  onPress={() => void setMode(option.value)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                >
+                  <Ionicons
+                    name={option.icon}
+                    size={20}
+                    color={selected ? "#FFFFFF" : mode === "dark" ? "#A9B5AB" : "#68736B"}
+                  />
+                  <Text
+                    className={`ml-2 font-inter-semibold text-sm ${
+                      selected ? "text-white" : "text-agro-muted"
+                    }`}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
         {user?.rol === "ADMINISTRADOR" ? (
           <>
             <Text className="mb-1 mt-7 font-poppins-semibold text-base text-agro-text">
               Administración
             </Text>
-            <View className="rounded-card bg-white px-4 shadow-sm">
+            <View className="rounded-card bg-agro-surface px-4 shadow-sm">
               <Row
                 icon="people-outline"
                 title="Solicitudes de suscripción"
@@ -128,7 +182,7 @@ export default function SettingsScreen() {
         <Text className="mb-1 mt-7 font-poppins-semibold text-base text-agro-text">
           Proyecto
         </Text>
-        <View className="rounded-card bg-white px-4 shadow-sm">
+        <View className="rounded-card bg-agro-surface px-4 shadow-sm">
           <Row
             icon="card-outline"
             title={
@@ -147,7 +201,7 @@ export default function SettingsScreen() {
               )
             }
           />
-          <View className="h-px bg-black/5" />
+          <View className="h-px bg-agro-soft" />
           <Row
             icon="leaf-outline"
             title={`${batches.length} lotes registrados`}
@@ -157,7 +211,7 @@ export default function SettingsScreen() {
                 : "No hay proceso de secado activo"
             }
           />
-          <View className="h-px bg-black/5" />
+          <View className="h-px bg-agro-soft" />
           <Row
             icon="hardware-chip-outline"
             title={hasServiceAccess ? `${devices.length} dispositivos` : "Dispositivos bloqueados"}
@@ -171,7 +225,7 @@ export default function SettingsScreen() {
             onPress={() => router.push("/devices/link")}
             disabled={!hasServiceAccess}
           />
-          <View className="h-px bg-black/5" />
+          <View className="h-px bg-agro-soft" />
           <Row
             icon="server-outline"
             title="API conectada"
@@ -179,7 +233,7 @@ export default function SettingsScreen() {
           />
         </View>
         <Pressable
-          className={`mt-6 flex-row items-center justify-center rounded-button border px-5 py-4 ${hasServiceAccess ? "border-agro-green bg-white" : "border-black/5 bg-black/5"}`}
+          className={`mt-6 flex-row items-center justify-center rounded-button border px-5 py-4 ${hasServiceAccess ? "border-agro-green bg-agro-surface" : "border-agro-line bg-agro-soft"}`}
           onPress={() => router.push("/batches/create")}
           disabled={!hasServiceAccess}
         >
@@ -189,7 +243,7 @@ export default function SettingsScreen() {
           </Text>
         </Pressable>
         <Pressable
-          className={`mt-3 flex-row items-center justify-center rounded-button px-5 py-4 ${hasServiceAccess ? "bg-agro-green" : "bg-black/10"}`}
+          className={`mt-3 flex-row items-center justify-center rounded-button px-5 py-4 ${hasServiceAccess ? "bg-agro-green" : "bg-agro-soft"}`}
           onPress={() => router.push("/processes/start")}
           disabled={!hasServiceAccess}
         >
@@ -198,7 +252,7 @@ export default function SettingsScreen() {
             {hasServiceAccess ? "Iniciar proceso de secado" : "Proceso de secado bloqueado"}
           </Text>
         </Pressable>
-        <View className="mt-6 rounded-card bg-white px-4 shadow-sm">
+        <View className="mt-6 rounded-card bg-agro-surface px-4 shadow-sm">
           <Row
             icon="log-out-outline"
             title="Cerrar sesión"

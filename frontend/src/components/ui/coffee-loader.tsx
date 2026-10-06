@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Animated, Image, Text, View } from "react-native";
 
+import { useAppTheme } from "@/context/theme-context";
+
 const brandLogo = require("../../../assets/brand/agrocoffee-logo.png");
 const LOGO_WIDTH = 72;
 const LOGO_HEIGHT = 90;
@@ -12,6 +14,7 @@ type CoffeeLoaderProps = {
 export function CoffeeLoader({
   label = "Preparando AgroCoffee AI...",
 }: CoffeeLoaderProps) {
+  const { isDark } = useAppTheme();
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export function CoffeeLoader({
           style={{
             width: LOGO_WIDTH,
             height: LOGO_HEIGHT,
-            tintColor: "#D9C8BC",
+            tintColor: isDark ? "#48534B" : "#D9C8BC",
           }}
         />
 
@@ -72,7 +75,7 @@ export function CoffeeLoader({
               left: 0,
               width: LOGO_WIDTH,
               height: LOGO_HEIGHT,
-              tintColor: "#6B3518",
+              tintColor: isDark ? "#F7F1E3" : "#6B3518",
             }}
           />
         </Animated.View>

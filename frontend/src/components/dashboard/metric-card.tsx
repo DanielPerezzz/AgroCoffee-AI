@@ -2,6 +2,8 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import type { ComponentProps } from "react";
 import { Text, View } from "react-native";
 
+import { useAppTheme } from "@/context/theme-context";
+
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
 
 type MetricCardProps = {
@@ -27,6 +29,7 @@ export function MetricCard({
   description,
   wide = false,
 }: MetricCardProps) {
+  const { isDark } = useAppTheme();
   const trendColor = {
     up: "#D9534F",
     down: "#2F8F46",
@@ -41,12 +44,12 @@ export function MetricCard({
 
   return (
     <View
-      className="mb-4 min-h-36 rounded-card border border-black/5 bg-white p-4 shadow-sm"
+      className="mb-4 min-h-36 rounded-card border border-agro-line bg-agro-surface p-4 shadow-sm"
       style={{ width: wide ? "100%" : "48%" }}
     >
       <View
         className="h-11 w-11 items-center justify-center rounded-2xl"
-        style={{ backgroundColor: iconBackground }}
+        style={{ backgroundColor: isDark ? `${iconColor}26` : iconBackground }}
       >
         <Ionicons name={icon} size={25} color={iconColor} />
       </View>

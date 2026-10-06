@@ -1,7 +1,7 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { publicRequest, withJsonHeaders } from "@/services/api";
+import { useAppTheme } from "@/context/theme-context";
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
@@ -24,6 +25,7 @@ function param(value: string | string[] | undefined): string {
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
+  const { isDark } = useAppTheme();
   const params = useLocalSearchParams<{ email?: string; code?: string }>();
   const [email, setEmail] = useState(() => param(params.email));
   const [code, setCode] = useState(() => param(params.code));
@@ -87,7 +89,7 @@ export default function ResetPasswordScreen() {
       <Text className="mt-5 font-poppins-semibold text-sm text-agro-text">
         {label}
       </Text>
-      <View className="mt-2 flex-row items-center rounded-button border border-black/10 bg-agro-cream px-4">
+      <View className="mt-2 flex-row items-center rounded-button border border-agro-line bg-agro-cream px-4">
         <Ionicons name="lock-closed-outline" size={22} color="#68736B" />
         <TextInput
           className="ml-3 flex-1 py-4 font-inter text-base text-agro-text"
@@ -112,8 +114,15 @@ export default function ResetPasswordScreen() {
   );
 
   return (
-    <LinearGradient colors={["#EAF4E7", "#F7F5ED", "#FFFFFF"]} style={{ flex: 1 }}>
-      <StatusBar style="dark" />
+    <LinearGradient
+      colors={
+        isDark
+          ? (["#142019", "#0E1511", "#18211B"] as const)
+          : (["#EAF4E7", "#F7F5ED", "#FFFFFF"] as const)
+      }
+      style={{ flex: 1 }}
+    >
+      <ThemedStatusBar />
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -126,7 +135,7 @@ export default function ResetPasswordScreen() {
             showsVerticalScrollIndicator={false}
           >
             <Pressable
-              className="mb-6 h-11 w-11 items-center justify-center rounded-full bg-white"
+              className="mb-6 h-11 w-11 items-center justify-center rounded-full bg-agro-surface"
               onPress={() => router.back()}
             >
               <Ionicons name="arrow-back" size={23} color="#2F7D32" />
@@ -138,12 +147,12 @@ export default function ResetPasswordScreen() {
               Introduce el código temporal y establece una clave segura.
             </Text>
 
-            <View className="mt-7 rounded-card bg-white p-6 shadow-lg">
+            <View className="mt-7 rounded-card bg-agro-surface p-6 shadow-lg">
               <Text className="font-poppins-semibold text-sm text-agro-text">
                 Correo electrónico
               </Text>
               <TextInput
-                className="mt-2 rounded-button border border-black/10 bg-agro-cream px-4 py-4 font-inter text-base text-agro-text"
+                className="mt-2 rounded-button border border-agro-line bg-agro-cream px-4 py-4 font-inter text-base text-agro-text"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -155,7 +164,7 @@ export default function ResetPasswordScreen() {
                 Código de seis dígitos
               </Text>
               <TextInput
-                className="mt-2 rounded-button border border-black/10 bg-agro-cream px-4 py-4 text-center font-poppins-bold text-2xl tracking-widest text-agro-coffee"
+                className="mt-2 rounded-button border border-agro-line bg-agro-cream px-4 py-4 text-center font-poppins-bold text-2xl tracking-widest text-agro-coffee"
                 placeholder="000000"
                 placeholderTextColor="#8A938C"
                 value={code}

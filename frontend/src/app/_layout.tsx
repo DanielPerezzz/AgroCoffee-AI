@@ -19,11 +19,13 @@ import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/context/auth-context";
 import { ProcessDataProvider } from "@/context/process-data-context";
 import { SubscriptionProvider } from "@/context/subscription-context";
+import { ThemeProvider, useAppTheme } from "@/context/theme-context";
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { isAuthenticated, user } = useAuth();
+  const { isDark } = useAppTheme();
 
   return (
     <>
@@ -50,7 +52,7 @@ function RootNavigator() {
         </Stack.Protected>
       </Stack>
 
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? "light" : "dark"} />
     </>
   );
 }
@@ -76,12 +78,14 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <SubscriptionProvider>
-        <ProcessDataProvider>
-          <RootNavigator />
-        </ProcessDataProvider>
-      </SubscriptionProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <ProcessDataProvider>
+            <RootNavigator />
+          </ProcessDataProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

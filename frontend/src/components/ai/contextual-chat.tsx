@@ -102,7 +102,7 @@ export function ContextualChat({ processId }: { processId?: number | null }) {
       className={`mb-3 max-w-[88%] rounded-2xl px-4 py-3 ${
         item.role === "user"
           ? "self-end rounded-br-sm bg-agro-green"
-          : "self-start rounded-bl-sm bg-white"
+          : "self-start rounded-bl-sm bg-agro-surface"
       }`}
     >
       <Text
@@ -140,14 +140,14 @@ export function ContextualChat({ processId }: { processId?: number | null }) {
         }
         ListFooterComponent={
           isSending ? (
-            <View className="mb-3 self-start rounded-2xl rounded-bl-sm bg-white px-5 py-3">
+            <View className="mb-3 self-start rounded-2xl rounded-bl-sm bg-agro-surface px-5 py-3">
               <ActivityIndicator size="small" color="#2F7D32" />
             </View>
           ) : null
         }
       />
 
-      <View className="border-t border-black/5 bg-white px-4 pb-3 pt-3">
+      <View className="border-t border-agro-line bg-agro-surface px-4 pb-3 pt-3">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -168,7 +168,7 @@ export function ContextualChat({ processId }: { processId?: number | null }) {
           ))}
         </ScrollView>
 
-        <View className="mt-3 flex-row items-end rounded-2xl border border-black/10 bg-agro-surface px-3 py-2">
+        <View className="mt-3 flex-row items-end rounded-2xl border border-agro-line bg-agro-surface px-3 py-2">
           <TextInput
             value={input}
             onChangeText={setInput}
@@ -184,7 +184,7 @@ export function ContextualChat({ processId }: { processId?: number | null }) {
           />
           <Pressable
             className={`ml-2 h-11 w-11 items-center justify-center rounded-full ${
-              input.trim() && !isSending ? "bg-agro-green" : "bg-black/10"
+              input.trim() && !isSending ? "bg-agro-green" : "bg-agro-soft"
             }`}
             onPress={() => void sendMessage()}
             disabled={!input.trim() || isSending}
