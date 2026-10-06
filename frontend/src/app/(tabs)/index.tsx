@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { HumidityChart } from "@/components/dashboard/humidity-chart";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { ServiceAccessNotice } from "@/components/subscriptions/service-access-notice";
+import { LiveDataIndicator } from "@/components/ui/live-data-indicator";
 import { useProcessData } from "@/context/process-data-context";
 import { useSubscription } from "@/context/subscription-context";
 import { getDryingAppearance } from "@/utils/drying-status";
@@ -33,13 +34,17 @@ export default function HomeScreen() {
   const appearance = getDryingAppearance(latestPrediction?.estado_secado);
   const { hasServiceAccess, subscription } = useSubscription();
   const history = [...measurements].reverse().slice(-9);
+  const isReceivingData = Boolean(
+    latestMeasurement &&
+      Date.now() - new Date(latestMeasurement.fecha_hora).getTime() <= 30000,
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}>
       <StatusBar style="dark" />
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: 18, paddingTop: 12, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => void refreshData(true)} colors={["#2F7D32"]} />}
       >
@@ -122,7 +127,7 @@ export default function HomeScreen() {
               <View className="flex-row items-center justify-between"><View className="flex-row items-center"><Ionicons name="time-outline" size={24} color="#FFFFFF" /><Text className="ml-2 font-inter text-sm text-white/80">Tiempo restante estimado</Text></View><Text className="font-poppins-bold text-xl text-agro-yellow">{latestPrediction?.tiempo_restante_horas ? `${formatNumber(latestPrediction.tiempo_restante_horas)} h` : "--"}</Text></View>
             </View>
 
-            <View className="mb-3 mt-7 flex-row items-end justify-between"><View><Text className="font-poppins-semibold text-lg text-agro-text">Variables actuales</Text><Text className="mt-1 font-inter text-xs text-agro-muted">Última lectura recibida</Text></View><View className="flex-row items-center"><View className={`mr-2 h-2 w-2 rounded-full ${latestMeasurement ? "bg-agro-green" : "bg-agro-muted"}`} /><Text className="font-inter-medium text-xs text-agro-green">{latestMeasurement ? "En línea" : "Esperando datos"}</Text></View></View>
+            <View className="mb-3 mt-7 flex-row items-end justify-between"><View><Text className="font-poppins-semibold text-lg text-agro-text">Variables actuales</Text><Text className="mt-1 font-inter text-xs text-agro-muted">Última lectura recibida</Text></View><LiveDataIndicator active={isReceivingData} /></View>
             <View className="flex-row flex-wrap justify-between">
               <MetricCard title="Temperatura" value={`${formatNumber(latestMeasurement?.temperatura)} °C`} icon="thermometer-outline" iconColor="#D9534F" iconBackground="#FDECEB" />
               <MetricCard title="Humedad ambiental" value={`${formatNumber(latestMeasurement?.humedad_ambiental)} %`} icon="water-outline" iconColor="#2878C7" iconBackground="#EAF4FF" />

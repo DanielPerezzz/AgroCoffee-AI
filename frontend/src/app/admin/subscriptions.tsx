@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AnimatedProgressBar } from "@/components/ui/animated-progress-bar";
+import { CoffeeLoader } from "@/components/ui/coffee-loader";
 import { useAuth } from "@/context/auth-context";
 import { withJsonHeaders } from "@/services/api";
 import type { AdminSubscription, SubscriptionStatus } from "@/types/api";
@@ -186,10 +188,7 @@ export default function AdminSubscriptionsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-agro-cream">
-        <ActivityIndicator size="large" color="#2F7D32" />
-        <Text className="mt-3 font-inter text-sm text-agro-muted">
-          Cargando solicitudes...
-        </Text>
+        <CoffeeLoader label="Cargando solicitudes..." />
       </SafeAreaView>
     );
   }
@@ -312,11 +311,8 @@ export default function AdminSubscriptionsScreen() {
                 </View>
               </View>
 
-              <View className="mt-4 h-2 overflow-hidden rounded-full bg-black/5">
-                <View
-                  className="h-full rounded-full bg-agro-green"
-                  style={{ width: `${item.progreso_porcentaje}%` }}
-                />
+              <View className="mt-4">
+                <AnimatedProgressBar value={item.progreso_porcentaje} />
               </View>
               <Text className="mt-2 text-right font-inter-semibold text-xs text-agro-green-dark">
                 {item.progreso_porcentaje}% del contrato

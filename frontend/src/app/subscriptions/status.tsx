@@ -4,6 +4,8 @@ import { StatusBar } from "expo-status-bar";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AnimatedProgressBar } from "@/components/ui/animated-progress-bar";
+import { CoffeeLoader } from "@/components/ui/coffee-loader";
 import { useSubscription } from "@/context/subscription-context";
 import type { SubscriptionStatus } from "@/types/api";
 
@@ -55,6 +57,14 @@ export default function SubscriptionStatusScreen() {
     router.replace("/(tabs)");
   };
 
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-agro-cream">
+        <CoffeeLoader label="Consultando tu suscripción..." />
+      </SafeAreaView>
+    );
+  }
+
   if (!isLoading && !subscription) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED", justifyContent: "center", padding: 24 }}>
@@ -99,8 +109,13 @@ export default function SubscriptionStatusScreen() {
                 <Text className="mr-3 flex-1 font-poppins-bold text-2xl text-white">{subscription.plan.nombre}</Text>
                 <Text className="font-poppins-bold text-xl text-agro-yellow">${Number(subscription.plan.precio_mensual).toFixed(2)}/mes</Text>
               </View>
-              <View className="mt-5 h-3 overflow-hidden rounded-full bg-white/20">
-                <View className="h-full rounded-full bg-agro-yellow" style={{ width: `${subscription.progreso_porcentaje}%` }} />
+              <View className="mt-5">
+                <AnimatedProgressBar
+                  value={subscription.progreso_porcentaje}
+                  color="#F5B700"
+                  backgroundColor="rgba(255, 255, 255, 0.2)"
+                  height={12}
+                />
               </View>
               <View className="mt-2 flex-row justify-between">
                 <Text className="font-inter-semibold text-xs text-white">{statusLabel[subscription.estado]}</Text>

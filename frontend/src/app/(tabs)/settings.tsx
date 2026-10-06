@@ -84,7 +84,7 @@ export default function SettingsScreen() {
         contentContainerStyle={{
           paddingHorizontal: 18,
           paddingTop: 14,
-          paddingBottom: 120,
+          paddingBottom: 32,
         }}
         showsVerticalScrollIndicator={false}
       >
