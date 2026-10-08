@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -12,16 +12,23 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    generate_password_reset_code,
     hash_password,
+    hash_password_reset_code,
     hash_token,
     verify_password,
+    verify_password_reset_code,
 )
+from app.models.password_reset_token import PasswordResetToken
 from app.models.refresh_token import RefreshToken
 from app.models.usuario import Usuario
 from app.schemas.auth import (
     ChangePasswordRequest,
     LogoutRequest,
     MessageResponse,
+    PasswordResetConfirmRequest,
+    PasswordResetStartRequest,
+    PasswordResetStartResponse,
     RefreshTokenRequest,
     TokenResponse,
 )
@@ -32,6 +39,11 @@ router = APIRouter(
     prefix="/auth",
     tags=["Autenticación"],
 )
+
+PASSWORD_RESET_MESSAGE = (
+    "Si el correo está registrado, se generó un código de recuperación."
+)
+PASSWORD_RESET_ERROR = "El código es inválido, expiró o ya fue utilizado"
 
 
 def unauthorized_exception() -> HTTPException:
@@ -263,8 +275,149 @@ async def change_password(
         )
         .values(revocado_en=now)
     )
+    await db.execute(
+        update(PasswordResetToken)
+        .where(
+            PasswordResetToken.id_usuario == current_user.id_usuario,
+            PasswordResetToken.usado_en.is_(None),
+        )
+        .values(usado_en=now)
+    )
     await db.commit()
 
     return MessageResponse(
         message="Contraseña actualizada correctamente",
+    )
+
+
+@router.post(
+    "/password-reset/request",
+    response_model=PasswordResetStartResponse,
+)
+async def request_password_reset(
+    data: PasswordResetStartRequest,
+    db: DatabaseSession,
+) -> PasswordResetStartResponse:
+    correo = str(data.correo).strip().lower()
+    usuario = await db.scalar(
+        select(Usuario).where(Usuario.correo == correo)
+    )
+    expires_in = settings.password_reset_code_expire_minutes * 60
+    demo_code: str | None = None
+
+    if usuario is not None:
+        now = datetime.now(timezone.utc)
+        await db.execute(
+            update(PasswordResetToken)
+            .where(
+                PasswordResetToken.id_usuario == usuario.id_usuario,
+                PasswordResetToken.usado_en.is_(None),
+            )
+            .values(usado_en=now)
+        )
+        code = generate_password_reset_code()
+        db.add(
+            PasswordResetToken(
+                id_usuario=usuario.id_usuario,
+                codigo_hash=hash_password_reset_code(correo, code),
+                expira_en=now
+                + timedelta(
+                    minutes=settings.password_reset_code_expire_minutes,
+                ),
+            )
+        )
+        await db.commit()
+
+        if (
+            settings.password_reset_expose_code
+            and settings.environment.lower() != "production"
+        ):
+            demo_code = code
+
+    return PasswordResetStartResponse(
+        message=PASSWORD_RESET_MESSAGE,
+        expires_in=expires_in,
+        demo_code=demo_code,
+    )
+
+
+@router.post(
+    "/password-reset/confirm",
+    response_model=MessageResponse,
+)
+async def confirm_password_reset(
+    data: PasswordResetConfirmRequest,
+    db: DatabaseSession,
+) -> MessageResponse:
+    correo = str(data.correo).strip().lower()
+    usuario = await db.scalar(
+        select(Usuario).where(Usuario.correo == correo)
+    )
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=PASSWORD_RESET_ERROR,
+        )
+
+    reset_token = await db.scalar(
+        select(PasswordResetToken)
+        .where(
+            PasswordResetToken.id_usuario == usuario.id_usuario,
+            PasswordResetToken.usado_en.is_(None),
+        )
+        .order_by(PasswordResetToken.creado_en.desc())
+        .limit(1)
+    )
+    now = datetime.now(timezone.utc)
+    if (
+        reset_token is None
+        or reset_token.expira_en <= now
+        or reset_token.intentos_fallidos
+        >= settings.password_reset_max_attempts
+    ):
+        if reset_token is not None and reset_token.usado_en is None:
+            reset_token.usado_en = now
+            await db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=PASSWORD_RESET_ERROR,
+        )
+
+    if not verify_password_reset_code(
+        correo,
+        data.codigo,
+        reset_token.codigo_hash,
+    ):
+        reset_token.intentos_fallidos += 1
+        if (
+            reset_token.intentos_fallidos
+            >= settings.password_reset_max_attempts
+        ):
+            reset_token.usado_en = now
+        await db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=PASSWORD_RESET_ERROR,
+        )
+
+    if verify_password(data.new_password, usuario.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La nueva contraseña debe ser diferente a la anterior",
+        )
+
+    usuario.password_hash = hash_password(data.new_password)
+    reset_token.usado_en = now
+    await db.execute(
+        update(RefreshToken)
+        .where(
+            RefreshToken.id_usuario == usuario.id_usuario,
+            RefreshToken.revocado_en.is_(None),
+        )
+        .values(revocado_en=now)
+    )
+    await db.commit()
+
+    return MessageResponse(
+        message="Contraseña restablecida correctamente",
     )

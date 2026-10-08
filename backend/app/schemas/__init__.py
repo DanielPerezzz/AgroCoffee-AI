@@ -7,6 +7,9 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     LogoutRequest,
     MessageResponse,
+    PasswordResetConfirmRequest,
+    PasswordResetStartRequest,
+    PasswordResetStartResponse,
     RefreshTokenRequest,
     TokenResponse,
 )
@@ -46,9 +49,11 @@ from app.schemas.sensor import (
 )
 from app.schemas.suscripcion import (
     PlanSuscripcionResponse,
+    SuscripcionAdminResponse,
     SuscripcionCreate,
     SuscripcionEstadoUpdate,
     SuscripcionResponse,
+    SuscripcionUsuarioResponse,
 )
 from app.schemas.usuario import (
     UsuarioCreate,
@@ -64,6 +69,9 @@ __all__ = [
     "ChangePasswordRequest",
     "LogoutRequest",
     "MessageResponse",
+    "PasswordResetConfirmRequest",
+    "PasswordResetStartRequest",
+    "PasswordResetStartResponse",
     "RefreshTokenRequest",
     "TokenResponse",
     "DispositivoCreate",
@@ -87,9 +95,11 @@ __all__ = [
     "SensorResponse",
     "SensorUpdate",
     "PlanSuscripcionResponse",
+    "SuscripcionAdminResponse",
     "SuscripcionCreate",
     "SuscripcionEstadoUpdate",
     "SuscripcionResponse",
+    "SuscripcionUsuarioResponse",
     "UsuarioCreate",
     "UsuarioRegister",
     "UsuarioResponse",

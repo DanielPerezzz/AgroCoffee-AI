@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -10,18 +11,20 @@ module.exports = {
     extend: {
       colors: {
         agro: {
-          green: "#2F7D32",
-          "green-dark": "#1F5A24",
-          "green-light": "#EAF4E7",
-          coffee: "#6B3518",
-          orange: "#F28C00",
-          yellow: "#F5B700",
-          blue: "#2878C7",
-          red: "#D32F2F",
-          cream: "#F7F5ED",
-          surface: "#FFFFFF",
-          text: "#18201A",
-          muted: "#68736B",
+          green: "rgb(var(--agro-green) / <alpha-value>)",
+          "green-dark": "rgb(var(--agro-green-dark) / <alpha-value>)",
+          "green-light": "rgb(var(--agro-green-light) / <alpha-value>)",
+          coffee: "rgb(var(--agro-coffee) / <alpha-value>)",
+          orange: "rgb(var(--agro-orange) / <alpha-value>)",
+          yellow: "rgb(var(--agro-yellow) / <alpha-value>)",
+          blue: "rgb(var(--agro-blue) / <alpha-value>)",
+          red: "rgb(var(--agro-red) / <alpha-value>)",
+          cream: "rgb(var(--agro-cream) / <alpha-value>)",
+          surface: "rgb(var(--agro-surface) / <alpha-value>)",
+          text: "rgb(var(--agro-text) / <alpha-value>)",
+          muted: "rgb(var(--agro-muted) / <alpha-value>)",
+          line: "rgb(var(--agro-line) / <alpha-value>)",
+          soft: "rgb(var(--agro-soft) / <alpha-value>)",
         },
       },
 

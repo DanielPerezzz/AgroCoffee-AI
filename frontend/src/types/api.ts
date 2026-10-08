@@ -3,16 +3,10 @@ export type UserRole = "ADMINISTRADOR" | "PRODUCTOR" | "TECNICO";
 export type GeneralStatus = "ACTIVO" | "INACTIVO";
 
 export type ProcessStatus =
-  | "EN_PROCESO"
-  | "PAUSADO"
-  | "FINALIZADO"
-  | "CANCELADO";
+  "EN_PROCESO" | "PAUSADO" | "FINALIZADO" | "CANCELADO";
 
 export type DryingStatus =
-  | "FAVORABLE"
-  | "SECADO_LENTO"
-  | "DESFAVORABLE"
-  | "COMPLETADO";
+  "FAVORABLE" | "SECADO_LENTO" | "DESFAVORABLE" | "COMPLETADO";
 
 export type AlertLevel = "INFORMACION" | "ADVERTENCIA" | "CRITICA";
 
@@ -102,6 +96,10 @@ export type Subscription = {
   fecha_fin: string | null;
   progreso_porcentaje: number;
   plan: SubscriptionPlan;
+};
+
+export type AdminSubscription = Subscription & {
+  usuario: Pick<ApiUser, "id_usuario" | "nombre" | "correo">;
 };
 
 export type Measurement = {

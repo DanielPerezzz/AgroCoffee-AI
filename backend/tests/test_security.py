@@ -1,11 +1,17 @@
+import pytest
+
 from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    generate_password_reset_code,
     hash_password,
+    hash_password_reset_code,
     hash_token,
     verify_password,
+    verify_password_reset_code,
 )
+from app.schemas.auth import PasswordResetConfirmRequest
 
 
 def test_password_is_hashed_and_verified() -> None:
@@ -44,3 +50,38 @@ def test_token_hash_is_stable_and_not_plaintext() -> None:
 
     assert hash_token(token) == hash_token(token)
     assert hash_token(token) != token
+
+
+def test_password_reset_code_has_six_digits() -> None:
+    code = generate_password_reset_code()
+    assert len(code) == 6
+    assert code.isdigit()
+
+
+def test_password_reset_hash_is_bound_to_email_and_code() -> None:
+    code_hash = hash_password_reset_code("user@example.com", "123456")
+
+    assert verify_password_reset_code(
+        "USER@example.com",
+        "123456",
+        code_hash,
+    )
+    assert not verify_password_reset_code(
+        "other@example.com",
+        "123456",
+        code_hash,
+    )
+    assert not verify_password_reset_code(
+        "user@example.com",
+        "654321",
+        code_hash,
+    )
+
+
+def test_password_reset_schema_rejects_non_numeric_code() -> None:
+    with pytest.raises(ValueError):
+        PasswordResetConfirmRequest(
+            correo="user@example.com",
+            codigo="12AB56",
+            new_password="CafeSeguro123",
+        )

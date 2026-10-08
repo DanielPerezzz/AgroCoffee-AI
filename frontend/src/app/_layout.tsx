@@ -16,14 +16,17 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
+import { AppAlertProvider } from "@/components/ui/app-alert";
 import { AuthProvider, useAuth } from "@/context/auth-context";
 import { ProcessDataProvider } from "@/context/process-data-context";
 import { SubscriptionProvider } from "@/context/subscription-context";
+import { ThemeProvider, useAppTheme } from "@/context/theme-context";
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { isDark } = useAppTheme();
 
   return (
     <>
@@ -36,6 +39,7 @@ function RootNavigator() {
 
         <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="batches/index" />
           <Stack.Screen name="batches/create" />
           <Stack.Screen name="processes/start" />
           <Stack.Screen name="devices/link" />
@@ -43,10 +47,14 @@ function RootNavigator() {
           <Stack.Screen name="subscriptions/status" />
           <Stack.Screen name="ai/chat" />
           <Stack.Screen name="explore" />
+
+          <Stack.Protected guard={user?.rol === "ADMINISTRADOR"}>
+            <Stack.Screen name="admin/subscriptions" />
+          </Stack.Protected>
         </Stack.Protected>
       </Stack>
 
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? "light" : "dark"} />
     </>
   );
 }
@@ -72,12 +80,16 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <SubscriptionProvider>
-        <ProcessDataProvider>
-          <RootNavigator />
-        </ProcessDataProvider>
-      </SubscriptionProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AppAlertProvider>
+        <AuthProvider>
+          <SubscriptionProvider>
+            <ProcessDataProvider>
+              <RootNavigator />
+            </ProcessDataProvider>
+          </SubscriptionProvider>
+        </AuthProvider>
+      </AppAlertProvider>
+    </ThemeProvider>
   );
 }

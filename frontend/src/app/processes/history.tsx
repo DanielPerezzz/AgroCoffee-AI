@@ -1,10 +1,9 @@
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemedStatusBar } from "@/components/ui/themed-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Alert } from "@/components/ui/app-alert";
 import { useProcessData } from "@/context/process-data-context";
 import type { DryingProcess, ProcessStatus } from "@/types/api";
 
@@ -97,8 +97,8 @@ export default function ProcessHistoryScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F5ED" }}>
-      <StatusBar style="dark" />
+    <SafeAreaView className="flex-1 bg-agro-cream">
+      <ThemedStatusBar />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 18,
@@ -115,7 +115,7 @@ export default function ProcessHistoryScreen() {
       >
         <View className="mb-6 flex-row items-center">
           <Pressable
-            className="h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm"
+            className="h-11 w-11 items-center justify-center rounded-full bg-agro-surface shadow-sm"
             onPress={() => router.back()}
           >
             <Ionicons name="arrow-back" size={23} color="#2F7D32" />
@@ -131,7 +131,7 @@ export default function ProcessHistoryScreen() {
         </View>
 
         {processHistory.length === 0 ? (
-          <View className="items-center rounded-card bg-white p-8 shadow-sm">
+          <View className="items-center rounded-card bg-agro-surface p-8 shadow-sm">
             <Ionicons name="time-outline" size={42} color="#879088" />
             <Text className="mt-3 font-poppins-semibold text-lg text-agro-text">
               Sin procesos registrados
@@ -151,7 +151,7 @@ export default function ProcessHistoryScreen() {
             return (
               <View
                 key={process.id_proceso}
-                className="mb-4 rounded-card bg-white p-5 shadow-sm"
+                className="mb-4 rounded-card bg-agro-surface p-5 shadow-sm"
               >
                 <View className="flex-row items-start justify-between">
                   <View>
@@ -180,7 +180,7 @@ export default function ProcessHistoryScreen() {
                   </View>
                 </View>
 
-                <View className="my-4 h-px bg-black/5" />
+                <View className="my-4 h-px bg-agro-soft" />
                 <Text className="font-inter text-xs text-agro-muted">
                   Inicio
                 </Text>
@@ -206,7 +206,7 @@ export default function ProcessHistoryScreen() {
                 {canControl ? (
                   <View className="mt-5 flex-row">
                     <Pressable
-                      className="mr-2 flex-1 flex-row items-center justify-center rounded-button border border-agro-green bg-white px-3 py-3 disabled:opacity-50"
+                      className="mr-2 flex-1 flex-row items-center justify-center rounded-button border border-agro-green bg-agro-surface px-3 py-3 disabled:opacity-50"
                       disabled={isBusy}
                       onPress={() =>
                         void changeStatus(
